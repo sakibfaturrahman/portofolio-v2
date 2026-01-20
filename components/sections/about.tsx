@@ -1,134 +1,167 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Code2, Database, Layers, Zap } from "lucide-react";
+import {
+  Code2,
+  Database,
+  Layers,
+  Zap,
+  GraduationCap,
+  Briefcase,
+  MapPin,
+  ExternalLink,
+} from "lucide-react";
 import { ScrollWrapper } from "@/components/scroll-wrapper";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   staggerContainerVariants,
   staggerItemVariants,
-  slideInLeftVariants,
-  slideInRightVariants,
+  fadeUpVariants,
 } from "@/lib/animations";
-
-const stats = [
-  { icon: Code2, value: "3+", label: "Years Coding" },
-  { icon: Database, value: "15+", label: "Projects Completed" },
-  { icon: Layers, value: "10+", label: "Tech Stack" },
-  { icon: Zap, value: "100%", label: "Dedication" },
-];
 
 export function About() {
   return (
-    <section id="about" className="py-20 md:py-32 relative">
-      <div className="max-w-6xl mx-auto px-6">
-        {/* Section Header */}
-        <ScrollWrapper className="text-center mb-16">
-          <p className="text-sm uppercase tracking-widest text-primary mb-4">
-            About Me
-          </p>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground text-balance">
-            Passionate About Building
-            <br />
-            <span className="text-primary">Scalable Solutions</span>
-          </h2>
+    <section id="about" className="py-24 md:py-32 relative overflow-hidden">
+      {/* Background Decorative Blur */}
+      <div className="absolute top-1/2 left-0 -translate-y-1/2 w-72 h-72 bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="max-w-6xl mx-auto px-6 relative">
+        <ScrollWrapper className="mb-16">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-foreground font-montserrat">
+                Personal <span className="text-primary">Narrative.</span>
+              </h2>
+            </div>
+            <p className="text-muted-foreground max-w-xs text-sm leading-relaxed border-l-2 border-primary/30 pl-4 italic">
+              "Building efficient back-end systems with a full-stack mindset
+              since 2024."
+            </p>
+          </div>
         </ScrollWrapper>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Image Side */}
-          <ScrollWrapper variants={slideInLeftVariants}>
-            <div className="relative">
-              <div className="absolute -inset-4 bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl blur-xl" />
-              <div className="relative rounded-2xl overflow-hidden border border-border bg-card">
-                <img
-                  src="https://images.unsplash.com/photo-1549692520-acc6669e2f0c?w=600&h=500&fit=crop"
-                  alt="Sakib working on code"
-                  className="w-full h-[400px] object-cover"
-                />
-              </div>
-
-              {/* Floating Card */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false }}
-                transition={{ delay: 0.5 }}
-                className="absolute -bottom-6 -right-6 md:right-6"
-              >
-                <Card className="bg-card/90 backdrop-blur-sm border-border shadow-xl">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Code2 className="w-6 h-6 text-primary" />
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold text-foreground">
-                          SMK RPL
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Graduate 2024
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </div>
-          </ScrollWrapper>
-
-          {/* Content Side */}
-          <ScrollWrapper variants={slideInRightVariants}>
-            <div className="space-y-6">
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Hi, I&apos;m{" "}
-                <span className="text-foreground font-medium">
-                  Sakib Faturrahman
-                </span>
-                , a web developer with a strong focus on Back-End development. I
-                graduated from SMK Rekayasa Perangkat Lunak (Software
-                Engineering Vocational School) and have been passionate about
-                building efficient, scalable systems ever since.
-              </p>
-
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                My journey began with understanding the fundamentals of
-                programming logic and database management. Today, I specialize
-                in creating clean architectures using technologies like{" "}
-                <span className="text-primary font-medium">
-                  PHP, Laravel, Node.js
-                </span>
-                , and various database systems.
-              </p>
-
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                While my heart lies in Back-End development, I&apos;ve been
-                expanding my skills to become a Full-Stack professional,
-                combining robust server-side solutions with engaging front-end
-                experiences.
-              </p>
-            </div>
-          </ScrollWrapper>
-        </div>
-
-        {/* Stats Grid */}
+        {/* Bento Grid Layout */}
         <motion.div
           variants={staggerContainerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.3 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-20"
+          viewport={{ once: false, amount: 0.1 }}
+          className="grid grid-cols-1 md:grid-cols-12 gap-4 auto-rows-[180px]"
         >
-          {stats.map((stat) => (
-            <motion.div key={stat.label} variants={staggerItemVariants}>
-              <Card className="bg-card/50 border-border hover:border-primary/50 transition-colors group">
-                <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                    <stat.icon className="w-6 h-6 text-primary" />
+          {/* Main Bio - Large Card */}
+          <motion.div
+            variants={staggerItemVariants}
+            className="md:col-span-8 md:row-span-2"
+          >
+            <Card className="h-full bg-card/40 backdrop-blur-md border-border/50 overflow-hidden group">
+              <CardContent className="p-8 flex flex-col h-full justify-between">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-primary">
+                    <MapPin className="w-4 h-4" />
+                    <span className="text-xs font-mono tracking-widest uppercase">
+                      Tasikmalaya, Indonesia
+                    </span>
                   </div>
-                  <p className="text-3xl font-bold text-foreground mb-1">
-                    {stat.value}
+                  <h3 className="text-2xl font-bold">
+                    The Architect Behind the Logic
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Hi, I&apos;m{" "}
+                    <span className="text-foreground font-semibold">
+                      Sakib Faturrahman
+                    </span>
+                    . My journey started at{" "}
+                    <span className="text-primary">
+                      SMK Rekayasa Perangkat Lunak
+                    </span>
+                    , where I fell in love with clean architecture. Now, as a
+                    student at
+                    <span className="font-medium text-foreground">
+                      {" "}
+                      Perjuangan University of Tasikmalaya
+                    </span>
+                    , I bridge the gap between robust back-end logic and
+                    seamless user experiences.
                   </p>
-                  <p className="text-sm text-muted-foreground">{stat.label}</p>
+                </div>
+                <div className="flex gap-4 mt-4">
+                  <div className="flex -space-x-2">
+                    {["PHP", "Laravel", "Node", "React"].map((t) => (
+                      <div
+                        key={t}
+                        className="w-8 h-8 rounded-full border-2 border-background bg-muted flex items-center justify-center text-[10px] font-bold"
+                      >
+                        {t[0]}
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground self-center italic">
+                    + more tech stack
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Experience Highlight */}
+          <motion.div
+            variants={staggerItemVariants}
+            className="md:col-span-4 md:row-span-1"
+          >
+            <Card className="h-full bg-primary text-primary-foreground border-none">
+              <CardContent className="p-6 flex flex-col justify-between h-full">
+                <Briefcase className="w-8 h-8 opacity-20" />
+                <div>
+                  <p className="text-3xl font-black">2024</p>
+                  <p className="text-xs font-medium uppercase tracking-tighter opacity-80">
+                    Active Freelance Career
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Education Highlight */}
+          <motion.div
+            variants={staggerItemVariants}
+            className="md:col-span-4 md:row-span-1"
+          >
+            <Card className="h-full bg-card/40 backdrop-blur-md border-border/50 border-dashed hover:border-solid transition-all">
+              <CardContent className="p-6 flex items-center gap-4 h-full">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <GraduationCap className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold uppercase tracking-widest">
+                    3rd Semester
+                  </p>
+                  <p className="text-xs text-muted-foreground">UNPER Student</p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Stats Cards - Mini Grid */}
+          {[
+            { label: "Years Coding", val: "3+", icon: Code2 },
+            { label: "Tech Stack", val: "10+", icon: Layers },
+            { label: "Completed", val: "15+", icon: Zap },
+            { label: "Passion", val: "100%", icon: ExternalLink },
+          ].map((s, i) => (
+            <motion.div
+              key={i}
+              variants={staggerItemVariants}
+              className="md:col-span-3 md:row-span-1"
+            >
+              <Card className="h-full bg-muted/30 border-border/50 hover:bg-primary/5 transition-all group">
+                <CardContent className="p-6 flex flex-col items-center justify-center h-full text-center">
+                  <s.icon className="w-5 h-5 text-primary mb-2 opacity-50 group-hover:opacity-100 transition-opacity" />
+                  <p className="text-2xl font-black tracking-tighter">
+                    {s.val}
+                  </p>
+                  <p className="text-[10px] uppercase font-bold text-muted-foreground">
+                    {s.label}
+                  </p>
                 </CardContent>
               </Card>
             </motion.div>

@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Briefcase, GraduationCap, Calendar } from "lucide-react";
+import { Briefcase, GraduationCap, Calendar, ExternalLink } from "lucide-react";
 import { ScrollWrapper } from "@/components/scroll-wrapper";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,17 +15,29 @@ interface TimelineItem {
   period: string;
   description: string;
   skills?: string[];
+  isCurrent?: boolean;
 }
 
 const timelineData: TimelineItem[] = [
   {
     type: "education",
-    title: "Rekayasa Perangkat Lunak (Software Engineering)",
-    organization: "SMK Negeri",
-    period: "2021 - 2024",
+    title: "Informatika (Computer Science)",
+    organization: "Universitas Perjuangan Tasikmalaya",
+    period: "2024 - Present",
+    isCurrent: true,
     description:
-      "Studied software engineering fundamentals including programming logic, database management, web development, and software project management. Developed strong foundation in Back-End development.",
-    skills: ["PHP", "MySQL", "HTML/CSS", "JavaScript"],
+      "Currently pursuing a bachelor's degree with a focus on algorithm development, data structures, and information system architecture. Actively exploring modern technologies in an academic environment.",
+    skills: ["Algorithm", "Data Structure", "System Analysis"],
+  },
+  {
+    type: "work",
+    title: "Freelance Full-Stack Developer",
+    organization: "Self-Employed",
+    period: "June 2024 - Present",
+    isCurrent: true,
+    description:
+      "Building various custom web applications for local and international clients. Focus on back-end scalability and responsive front-end integration. Handling the entire software development lifecycle.",
+    skills: ["Laravel", "Next.js", "MongoDB", "Tailwind CSS"],
   },
   {
     type: "work",
@@ -33,8 +45,17 @@ const timelineData: TimelineItem[] = [
     organization: "CV Abdi Creative Technology",
     period: "2023 - 2024",
     description:
-      "Gained hands-on experience in real-world web development projects. Collaborated with senior developers to build and maintain web applications. Learned industry best practices and agile methodologies.",
-    skills: ["Laravel", "MySQL", "Git", "RESTful API"],
+      "Collaborated in a team to develop company web-based applications. Learned professional workflows, Git flow, and RESTful API implementation in production scale.",
+    skills: ["PHP", "Laravel", "MySQL", "Git"],
+  },
+  {
+    type: "education",
+    title: "Software Engineering",
+    organization: "SMK Rekayasa Perangkat Lunak",
+    period: "2021 - 2024",
+    description:
+      "Learning the basics of programming, computer logic, and database management. Becoming the main foundation in starting a career as a software developer.",
+    skills: ["PHP", "JavaScript", "HTML/CSS", "Database Management"],
   },
 ];
 
@@ -45,55 +66,63 @@ function TimelineCard({ item, index }: { item: TimelineItem; index: number }) {
   return (
     <motion.div
       variants={staggerItemVariants}
-      className={`flex items-center gap-8 ${
+      className={`flex items-center gap-8 relative ${
         isEven ? "lg:flex-row" : "lg:flex-row-reverse"
       }`}
     >
       {/* Content */}
-      <div className={`flex-1 ${isEven ? "lg:text-right" : "lg:text-left"}`}>
-        <Card className="bg-card/50 border-border hover:border-primary/50 transition-all duration-300 group overflow-hidden">
+      <div
+        className={`flex-1 w-full ${isEven ? "lg:text-right" : "lg:text-left"}`}
+      >
+        <Card
+          className={`relative overflow-hidden bg-card/40 backdrop-blur-sm border-border hover:border-primary/50 transition-all duration-500 group ${item.isCurrent ? "ring-1 ring-primary/30" : ""}`}
+        >
+          {item.isCurrent && (
+            <div className="absolute top-0 right-0 p-2">
+              <Badge className="bg-primary text-primary-foreground text-[10px] animate-pulse">
+                Present
+              </Badge>
+            </div>
+          )}
+
           <CardContent className="p-6">
-            {/* Header */}
             <div
-              className={`flex items-start gap-4 mb-4 ${
-                isEven ? "lg:flex-row-reverse" : ""
-              }`}
+              className={`flex items-start gap-4 mb-4 ${isEven ? "lg:flex-row-reverse" : ""}`}
             >
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-500">
                 <Icon className="w-6 h-6 text-primary" />
               </div>
               <div className={isEven ? "lg:text-right" : ""}>
-                <h3 className="text-lg font-semibold text-foreground">
+                <h3 className="text-xl font-bold text-foreground font-montserrat tracking-tight">
                   {item.title}
                 </h3>
-                <p className="text-primary font-medium">{item.organization}</p>
+                <p className="text-primary font-mono text-sm tracking-tighter uppercase">
+                  {item.organization}
+                </p>
               </div>
             </div>
 
-            {/* Period */}
             <div
-              className={`flex items-center gap-2 text-sm text-muted-foreground mb-4 ${
-                isEven ? "lg:justify-end" : ""
-              }`}
+              className={`flex items-center gap-2 text-xs font-medium text-muted-foreground mb-4 ${isEven ? "lg:justify-end" : ""}`}
             >
-              <Calendar className="w-4 h-4" />
+              <Calendar className="w-3.5 h-3.5 text-primary/60" />
               {item.period}
             </div>
 
-            {/* Description */}
-            <p className="text-muted-foreground leading-relaxed mb-4">
+            <p className="text-sm text-muted-foreground leading-relaxed mb-6">
               {item.description}
             </p>
 
-            {/* Skills */}
             {item.skills && (
               <div
-                className={`flex flex-wrap gap-2 ${
-                  isEven ? "lg:justify-end" : ""
-                }`}
+                className={`flex flex-wrap gap-2 ${isEven ? "lg:justify-end" : ""}`}
               >
                 {item.skills.map((skill) => (
-                  <Badge key={skill} variant="secondary" className="text-xs">
+                  <Badge
+                    key={skill}
+                    variant="outline"
+                    className="text-[10px] py-0 border-primary/20 bg-primary/5"
+                  >
                     {skill}
                   </Badge>
                 ))}
@@ -103,12 +132,14 @@ function TimelineCard({ item, index }: { item: TimelineItem; index: number }) {
         </Card>
       </div>
 
-      {/* Timeline marker - Hidden on mobile */}
-      <div className="hidden lg:flex flex-col items-center">
-        <div className="w-4 h-4 rounded-full bg-primary border-4 border-background shadow-lg" />
+      {/* Marker */}
+      <div className="hidden lg:flex flex-col items-center z-10">
+        <motion.div
+          whileHover={{ scale: 1.5 }}
+          className={`w-4 h-4 rounded-full border-4 border-background shadow-xl transition-colors duration-300 ${item.isCurrent ? "bg-primary" : "bg-muted-foreground/30"}`}
+        />
       </div>
 
-      {/* Spacer for alignment */}
       <div className="hidden lg:block flex-1" />
     </motion.div>
   );
@@ -121,48 +152,41 @@ export function Experience() {
     offset: ["start center", "end center"],
   });
 
-  // Transform scroll progress to timeline height
   const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   return (
-    <section id="experience" className="py-20 md:py-32 relative">
+    <section id="experience" className="py-24 md:py-32 relative bg-zinc-950/30">
       <div className="max-w-6xl mx-auto px-6">
-        {/* Section Header */}
-        <ScrollWrapper className="text-center mb-16">
-          <p className="text-sm uppercase tracking-widest text-primary mb-4">
-            My Journey
-          </p>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground text-balance">
-            Experience & Education
-          </h2>
-          <p className="text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">
-            A timeline of my professional growth and educational background that
-            shaped my skills as a developer.
-          </p>
+        <ScrollWrapper className="mb-20">
+          <div className="flex flex-col items-center text-center">
+            <h2 className="text-4xl md:text-5xl font-black text-foreground font-montserrat tracking-tighter">
+              Experience & <span className="text-primary">Education.</span>
+            </h2>
+            <div className="h-1 w-20 bg-primary/20 mt-6 rounded-full" />
+          </div>
         </ScrollWrapper>
 
-        {/* Timeline */}
-        <div ref={containerRef} className="relative">
-          {/* Vertical Timeline Line - Desktop only */}
-          <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-0.5 -translate-x-1/2">
-            {/* Background line */}
-            <div className="absolute inset-0 bg-border" />
-            {/* Progress line */}
+        <div ref={containerRef} className="relative mt-10">
+          <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-border to-transparent" />
             <motion.div
-              className="absolute top-0 left-0 w-full bg-primary origin-top"
+              className="absolute top-0 left-0 w-full bg-gradient-to-b from-primary/50 to-primary origin-top shadow-[0_0_15px_rgba(var(--primary),0.5)]"
               style={{ height: lineHeight }}
             />
           </div>
 
-          {/* Timeline Items */}
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: false, amount: 0.2 }}
-            className="space-y-12"
+            viewport={{ once: false, amount: 0.1 }}
+            className="space-y-16"
           >
             {timelineData.map((item, index) => (
-              <TimelineCard key={item.title} item={item} index={index} />
+              <TimelineCard
+                key={item.title + index}
+                item={item}
+                index={index}
+              />
             ))}
           </motion.div>
         </div>

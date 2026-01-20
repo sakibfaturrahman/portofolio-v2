@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Moon, Sun, Menu, X } from "lucide-react";
+import { Moon, Sun, Menu, X, Languages } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,7 @@ const navLinks = [
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [language, setLanguage] = useState<"ID" | "EN">("ID");
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -27,7 +28,8 @@ export function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      // Navbar berubah saat di-scroll
+      setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -41,137 +43,133 @@ export function Navbar() {
     }
   };
 
+  const toggleLanguage = () => {
+    setLanguage((prev) => (prev === "ID" ? "EN" : "ID"));
+  };
+
   return (
     <>
-      <motion.header
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-        className={cn(
-          "fixed top-0 left-0 right-0 z-40 transition-all duration-300",
-          isScrolled
-            ? "bg-background/80 backdrop-blur-lg border-b border-border"
-            : "bg-transparent",
-        )}
-      >
-        <nav className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          {/* Logo */}
-          <motion.a
-            href="#"
-            className="text-xl font-bold text-foreground"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            SF
-          </motion.a>
+      <div className="fixed top-0 left-0 right-0 z-50 flex justify-center p-4 md:p-6 pointer-events-none">
+        <motion.header
+          initial={{ y: -100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className={cn(
+            "pointer-events-auto transition-all duration-500 ease-in-out overflow-hidden",
+            // Desain Kapsul Melayang (Desktop)
+            "w-full md:w-fit md:min-w-[500px] rounded-2xl md:rounded-full border border-border/50",
+            "bg-background/60 backdrop-blur-xl shadow-lg",
+            isScrolled ? "md:px-4 py-2" : "md:px-6 py-3",
+          )}
+        >
+          <nav className="flex items-center justify-between gap-8 px-4 md:px-2">
+            {/* Logo */}
+            <motion.a
+              href="#"
+              className="text-lg font-black text-foreground font-montserrat tracking-tighter shrink-0"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              SF<span className="text-primary">.</span>
+            </motion.a>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <motion.button
-                key={link.href}
-                onClick={() => handleNavClick(link.href)}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors relative group"
-                whileHover={{ y: -2 }}
-                whileTap={{ y: 0 }}
+            {/* Desktop Navigation Link */}
+            <div className="hidden md:flex items-center gap-6">
+              {navLinks.map((link) => (
+                <motion.button
+                  key={link.href}
+                  onClick={() => handleNavClick(link.href)}
+                  className="text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-all relative group"
+                >
+                  {link.label}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
+                </motion.button>
+              ))}
+            </div>
+
+            {/* Controls */}
+            <div className="flex items-center gap-1 md:gap-2 shrink-0">
+              {/* Language */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleLanguage}
+                className="h-8 md:h-9 px-2 md:px-3 rounded-full hover:bg-primary/10"
               >
-                {link.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
-              </motion.button>
-            ))}
-          </div>
+                <Languages className="h-4 w-4 text-primary mr-1 md:mr-2" />
+                <span className="text-[10px] font-black font-mono leading-none">
+                  {language}
+                </span>
+              </Button>
 
-          {/* Theme Toggle & Mobile Menu */}
-          <div className="flex items-center gap-2">
-            {mounted && (
+              {/* Theme Toggle */}
+              {mounted && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="h-8 w-8 md:h-9 md:w-9 rounded-full hover:bg-primary/10"
+                >
+                  <AnimatePresence mode="wait">
+                    {theme === "dark" ? (
+                      <motion.div
+                        key="sun"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0 }}
+                      >
+                        <Sun className="h-4 w-4 text-yellow-500" />
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="moon"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0 }}
+                      >
+                        <Moon className="h-4 w-4 text-blue-500" />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </Button>
+              )}
+
+              {/* Mobile Trigger */}
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="text-foreground"
+                className="md:hidden h-8 w-8 rounded-full"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               >
-                <AnimatePresence mode="wait">
-                  {theme === "dark" ? (
-                    <motion.div
-                      key="sun"
-                      initial={{ opacity: 0, rotate: -90 }}
-                      animate={{ opacity: 1, rotate: 0 }}
-                      exit={{ opacity: 0, rotate: 90 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <Sun className="h-5 w-5" />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="moon"
-                      initial={{ opacity: 0, rotate: 90 }}
-                      animate={{ opacity: 1, rotate: 0 }}
-                      exit={{ opacity: 0, rotate: -90 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <Moon className="h-5 w-5" />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-                <span className="sr-only">Toggle theme</span>
-              </Button>
-            )}
-
-            {/* Mobile Menu Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden text-foreground"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              <AnimatePresence mode="wait">
                 {isMobileMenuOpen ? (
-                  <motion.div
-                    key="close"
-                    initial={{ opacity: 0, rotate: -90 }}
-                    animate={{ opacity: 1, rotate: 0 }}
-                    exit={{ opacity: 0, rotate: 90 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <X className="h-5 w-5" />
-                  </motion.div>
+                  <X className="h-4 w-4" />
                 ) : (
-                  <motion.div
-                    key="menu"
-                    initial={{ opacity: 0, rotate: 90 }}
-                    animate={{ opacity: 1, rotate: 0 }}
-                    exit={{ opacity: 0, rotate: -90 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Menu className="h-5 w-5" />
-                  </motion.div>
+                  <Menu className="h-4 w-4" />
                 )}
-              </AnimatePresence>
-              <span className="sr-only">Toggle menu</span>
-            </Button>
-          </div>
-        </nav>
-      </motion.header>
+              </Button>
+            </div>
+          </nav>
+        </motion.header>
+      </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Dropdown */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-16 z-30 bg-background/95 backdrop-blur-lg border-b border-border md:hidden"
+            exit={{ opacity: 0, y: -10 }}
+            className="fixed inset-x-4 top-20 z-50 bg-background/95 backdrop-blur-2xl border border-border rounded-3xl md:hidden shadow-2xl overflow-hidden"
           >
-            <nav className="flex flex-col p-6 gap-4">
+            <nav className="flex flex-col p-6 gap-2">
               {navLinks.map((link, index) => (
                 <motion.button
                   key={link.href}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
+                  initial={{ x: -10, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: index * 0.05 }}
                   onClick={() => handleNavClick(link.href)}
-                  className="text-left text-lg text-muted-foreground hover:text-foreground transition-colors py-2"
+                  className="text-left text-sm font-bold uppercase tracking-widest text-muted-foreground hover:text-primary py-3 transition-colors border-b border-border/50 last:border-0"
                 >
                   {link.label}
                 </motion.button>

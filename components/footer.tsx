@@ -107,11 +107,6 @@ export function Footer() {
               © {new Date().getFullYear()} Sakib Faturrahman. All rights
               reserved.
             </p>
-            <p className="text-sm text-muted-foreground">
-              Built with <span className="text-foreground">Next.js</span>,{" "}
-              <span className="text-foreground">Tailwind CSS</span> &{" "}
-              <span className="text-foreground">Framer Motion</span>
-            </p>
           </div>
         </div>
       </footer>

@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { ArrowDown, Github, Linkedin, Mail } from "lucide-react";
+import { Github, Linkedin, Mail, FileText, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import gsap from "gsap";
 import {
   textRevealContainerVariants,
   textRevealCharVariants,
@@ -12,7 +13,6 @@ import {
   staggerItemVariants,
 } from "@/lib/animations";
 
-// Split text into individual characters for animation
 function AnimatedText({
   text,
   className,
@@ -41,254 +41,202 @@ function AnimatedText({
 }
 
 export function Hero() {
+  const [isHovered, setIsHovered] = useState(false);
+  const [spotlightPos, setSpotlightPos] = useState({ x: 50, y: 50 });
+  const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const helloRef = useRef<HTMLSpanElement>(null);
 
-  // Mouse tracking for parallax effect
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const smoothMouseX = useSpring(mouseX, { stiffness: 100, damping: 20 });
+  const smoothMouseY = useSpring(mouseY, { stiffness: 100, damping: 20 });
 
-  const springConfig = { stiffness: 100, damping: 20, mass: 0.5 };
-  const smoothMouseX = useSpring(mouseX, springConfig);
-  const smoothMouseY = useSpring(mouseY, springConfig);
-
-  // Transform mouse position to movement values
   const imageX = useTransform(smoothMouseX, [-0.5, 0.5], [-15, 15]);
   const imageY = useTransform(smoothMouseY, [-0.5, 0.5], [-15, 15]);
-  const gridX = useTransform(smoothMouseX, [-0.5, 0.5], [5, -5]);
-  const gridY = useTransform(smoothMouseY, [-0.5, 0.5], [5, -5]);
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const container = containerRef.current;
-      if (!container) return;
-
-      const rect = container.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-
-      mouseX.set(x);
-      mouseY.set(y);
+    // Deteksi Device
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    if (helloRef.current) {
+      const text = helloRef.current.innerText;
+      helloRef.current.innerHTML = text
+        .split("")
+        .map(
+          (c) =>
+            `<span class="char inline-block">${c === " " ? "&nbsp;" : c}</span>`,
+        )
+        .join("");
+      gsap.fromTo(
+        ".char",
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.03,
+          ease: "back.out",
+          delay: 0.5,
+        },
+      );
+    }
+
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      mouseX.set((e.clientX - rect.left) / rect.width - 0.5);
+      mouseY.set((e.clientY - rect.top) / rect.height - 0.5);
+    };
+
+    window.addEventListener("mousemove", handleGlobalMouseMove);
+    return () => {
+      window.removeEventListener("mousemove", handleGlobalMouseMove);
+      window.removeEventListener("resize", checkMobile);
+    };
   }, [mouseX, mouseY]);
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.querySelector(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+  const handleImageMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isMobile) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setSpotlightPos({ x, y });
   };
 
   return (
     <section
+      id="hero"
       ref={containerRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20"
     >
-      {/* Animated Grid Background */}
-      <motion.div
-        className="absolute inset-0 opacity-30 dark:opacity-20"
-        style={{ x: gridX, y: gridY }}
-      >
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_800px_at_50%_-100px,rgba(80,180,180,0.15),transparent)]" />
-      </motion.div>
-
-      {/* Gradient Orbs */}
-      <motion.div
-        className="absolute top-1/4 -left-32 w-96 h-96 bg-primary/20 rounded-full blur-3xl"
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.3, 0.5, 0.3],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <motion.div
-        className="absolute bottom-1/4 -right-32 w-96 h-96 bg-accent/20 rounded-full blur-3xl"
-        animate={{
-          scale: [1.2, 1, 1.2],
-          opacity: [0.5, 0.3, 0.5],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-
-      {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 py-20">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-20 w-full">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Text Content */}
+          {/* Konten Teks */}
           <motion.div
             variants={staggerContainerVariants}
             initial="hidden"
             animate="visible"
-            className="text-center lg:text-left"
+            className="text-center lg:text-left order-2 lg:order-1"
           >
-            {/* Greeting */}
-            <motion.p
+            <motion.div
               variants={staggerItemVariants}
-              className="text-sm uppercase tracking-widest text-primary mb-4"
+              className="mb-8 items-center lg:items-start flex flex-col"
             >
-              Web Developer
-            </motion.p>
+              <div className="bg-card/40 backdrop-blur-md border border-border/50 px-4 py-2 rounded-2xl">
+                <p className="text-sm italic text-muted-foreground">
+                  "developing future"
+                </p>
+              </div>
+            </motion.div>
 
-            {/* Name */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 overflow-hidden">
-              <AnimatedText text="Sakib" />
-              <br />
-              <AnimatedText text="Faturrahman" />
-            </h1>
+            <div className="mb-8">
+              <span
+                ref={helloRef}
+                className="text-lg font-medium text-muted-foreground block mb-3"
+              >
+                Hello there, I'm
+              </span>
+              <h1 className="text-5xl md:text-7xl font-black tracking-tighter font-montserrat leading-[0.9]">
+                <AnimatedText text="Sakib" />
+                <br />
+                <AnimatedText text="Faturrahman" />
+              </h1>
+            </div>
 
-            {/* Subtitle */}
             <motion.p
               variants={fadeUpVariants}
-              initial="hidden"
-              animate="visible"
-              transition={{ delay: 0.8 }}
-              className="text-lg md:text-xl text-muted-foreground max-w-md mx-auto lg:mx-0 mb-8 leading-relaxed"
+              className="text-lg text-muted-foreground mb-10 max-w-md mx-auto lg:mx-0"
             >
               Back-End Focused. Building{" "}
-              <span className="text-primary font-medium">scalable systems</span>{" "}
+              <span className="text-primary font-semibold">
+                scalable systems
+              </span>{" "}
               with clean architecture.
             </motion.p>
 
-            {/* CTA Buttons */}
             <motion.div
               variants={fadeUpVariants}
-              initial="hidden"
-              animate="visible"
-              transition={{ delay: 1 }}
               className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
             >
-              <Button
-                size="lg"
-                onClick={() => scrollToSection("#projects")}
-                className="group"
-              >
-                Explore My Work
-                <ArrowDown className="ml-2 h-4 w-4 transition-transform group-hover:translate-y-1" />
+              <Button size="lg" className="rounded-xl group bg-primary">
+                <FileText className="mr-2 h-5 w-5" /> Download My Resume
               </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => scrollToSection("#contact")}
-              >
-                Get in Touch
+              <Button variant="outline" size="lg" className="rounded-xl">
+                Contact Me
               </Button>
-            </motion.div>
-
-            {/* Social Links */}
-            <motion.div
-              variants={fadeUpVariants}
-              initial="hidden"
-              animate="visible"
-              transition={{ delay: 1.2 }}
-              className="flex gap-4 mt-8 justify-center lg:justify-start"
-            >
-              {[
-                { icon: Github, href: "https://github.com", label: "GitHub" },
-                {
-                  icon: Linkedin,
-                  href: "https://linkedin.com",
-                  label: "LinkedIn",
-                },
-                {
-                  icon: Mail,
-                  href: "mailto:hello@example.com",
-                  label: "Email",
-                },
-              ].map((social) => (
-                <motion.a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-3 rounded-full border border-border bg-card/50 text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
-                  whileHover={{ scale: 1.1, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <social.icon className="h-5 w-5" />
-                  <span className="sr-only">{social.label}</span>
-                </motion.a>
-              ))}
             </motion.div>
           </motion.div>
 
-          {/* Profile Image with Parallax */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{
-              duration: 0.8,
-              delay: 0.3,
-              ease: [0.25, 0.1, 0.25, 1],
-            }}
-            className="relative flex justify-center lg:justify-end"
-          >
-            <motion.div style={{ x: imageX, y: imageY }} className="relative">
-              {/* Decorative elements */}
-              <div className="absolute -inset-4 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-2xl" />
-              <div className="absolute -inset-1 bg-gradient-to-br from-primary/30 to-accent/30 rounded-full" />
+          {/* Bagian Foto Profil */}
+          <motion.div className="relative flex justify-center lg:justify-end order-1 lg:order-2">
+            <motion.div
+              style={{ x: imageX, y: imageY }}
+              className="relative lg:cursor-none"
+              data-hide-cursor="true"
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+              onMouseMove={handleImageMouseMove}
+            >
+              {/* Glow Aura */}
+              <div
+                className={`absolute -inset-10 bg-primary/10 rounded-full blur-3xl transition-opacity duration-1000 ${isHovered ? "opacity-100" : "opacity-30"}`}
+              />
 
-              {/* Image container */}
-              <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-card shadow-2xl">
+              <div className="relative w-72 h-72 md:w-96 md:h-96 lg:w-[420px] lg:h-[420px] rounded-[3rem] overflow-hidden border-[6px] border-card shadow-2xl transition-transform duration-500 hover:rotate-0 rotate-2 bg-zinc-900">
+                {/* Layer 1: Base Image */}
                 <img
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face"
-                  alt="Sakib Faturrahman - Professional photo"
-                  className="w-full h-full object-cover"
+                  src="/images/porto.webp"
+                  className={`w-full h-full object-cover transition-all duration-500 ${
+                    isMobile
+                      ? "grayscale-0 opacity-100 brightness-100"
+                      : "grayscale opacity-30 brightness-50"
+                  }`}
+                  alt="Background"
                 />
+
+                {/* Layer 2: Colored Image (Hanya aktif di Desktop) */}
+                {!isMobile && (
+                  <motion.div
+                    className="absolute inset-0 pointer-events-none"
+                    animate={{
+                      WebkitMaskImage: isHovered
+                        ? `radial-gradient(circle 100px at ${spotlightPos.x}% ${spotlightPos.y}%, black 20%, transparent 100%)`
+                        : `radial-gradient(circle 0px at ${spotlightPos.x}% ${spotlightPos.y}%, black 0%, transparent 0%)`,
+                    }}
+                    transition={{ type: "tween", ease: "circOut", duration: 0 }}
+                  >
+                    <img
+                      src="/images/porto.webp"
+                      className="w-full h-full object-cover"
+                      alt="Foreground"
+                    />
+                  </motion.div>
+                )}
               </div>
 
-              {/* Floating badges */}
+              {/* Float Badge */}
               <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.4 }}
-                className="absolute -left-4 top-1/4 px-4 py-2 bg-card border border-border rounded-full shadow-lg"
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 4, repeat: Infinity }}
+                className="absolute -left-6 top-1/4 px-5 py-2.5 bg-card/90 backdrop-blur-md border border-border rounded-2xl shadow-xl z-30"
               >
-                <span className="text-sm font-medium text-foreground">
-                  Back-End
-                </span>
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.6 }}
-                className="absolute -right-4 bottom-1/4 px-4 py-2 bg-card border border-border rounded-full shadow-lg"
-              >
-                <span className="text-sm font-medium text-foreground">
-                  Full-Stack
+                <span className="text-sm font-bold flex items-center gap-2">
+                  <div
+                    className={`w-2 h-2 rounded-full ${isHovered ? "bg-primary animate-pulse" : "bg-zinc-500"}`}
+                  />
+                  Fullstack Dev
                 </span>
               </motion.div>
             </motion.div>
           </motion.div>
         </div>
       </div>
-
-      {/* Scroll Indicator */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.8 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
-      >
-        <motion.button
-          onClick={() => scrollToSection("#about")}
-          className="flex flex-col items-center text-muted-foreground hover:text-foreground transition-colors"
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <span className="text-xs uppercase tracking-widest mb-2">Scroll</span>
-          <ArrowDown className="h-4 w-4" />
-        </motion.button>
-      </motion.div>
     </section>
   );
 }
