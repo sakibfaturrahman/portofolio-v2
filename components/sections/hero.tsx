@@ -30,7 +30,7 @@ function AnimatedText({
       {text.split("").map((char, index) => (
         <motion.span
           key={`${char}-${index}`}
-          variants={textRevealCharVariants}
+          variants={textRevealCharVariants as any}
           className="inline-block"
         >
           {char === " " ? "\u00A0" : char}
@@ -56,7 +56,6 @@ export function Hero() {
   const imageY = useTransform(smoothMouseY, [-0.5, 0.5], [-15, 15]);
 
   useEffect(() => {
-    // Deteksi Device
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1024);
     };
@@ -204,11 +203,16 @@ export function Hero() {
                 {!isMobile && (
                   <motion.div
                     className="absolute inset-0 pointer-events-none"
-                    animate={{
-                      WebkitMaskImage: isHovered
-                        ? `radial-gradient(circle 100px at ${spotlightPos.x}% ${spotlightPos.y}%, black 20%, transparent 100%)`
-                        : `radial-gradient(circle 0px at ${spotlightPos.x}% ${spotlightPos.y}%, black 0%, transparent 0%)`,
-                    }}
+                    animate={
+                      {
+                        WebkitMaskImage: isHovered
+                          ? `radial-gradient(circle 100px at ${spotlightPos.x}% ${spotlightPos.y}%, black 20%, transparent 100%)`
+                          : `radial-gradient(circle 0px at ${spotlightPos.x}% ${spotlightPos.y}%, black 0%, transparent 0%)`,
+                        maskImage: isHovered
+                          ? `radial-gradient(circle 100px at ${spotlightPos.x}% ${spotlightPos.y}%, black 20%, transparent 100%)`
+                          : `radial-gradient(circle 0px at ${spotlightPos.x}% ${spotlightPos.y}%, black 0%, transparent 0%)`,
+                      } as any
+                    }
                     transition={{ type: "tween", ease: "circOut", duration: 0 }}
                   >
                     <img

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp, Code2, Terminal } from "lucide-react";
+import { ChevronDown, ChevronUp, Terminal } from "lucide-react";
 import { ScrollWrapper } from "@/components/scroll-wrapper";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -174,23 +174,31 @@ export function Skills() {
               <AnimatePresence>
                 {allSkills.map((skill, index) => {
                   const isHiddenOnMobile = !isExpanded && index >= mobileLimit;
+                  const IconComponent = skill.icon;
 
                   return (
                     <motion.div
                       key={skill.name}
                       variants={staggerItemVariants}
                       whileHover={{ y: -5 }}
-                      className={`relative group ${isHiddenOnMobile ? "hidden sm:block" : "block"}`}
+                      className={`relative group ${
+                        isHiddenOnMobile ? "hidden sm:block" : "block"
+                      }`}
                     >
                       <div className="bg-card/40 backdrop-blur-sm border border-border/50 p-3.5 rounded-2xl flex items-center gap-4 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300">
-                        {/* Icon Wrapper with Grayscale Filter */}
+                        {/* Icon Wrapper */}
                         <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-background/50 border border-border/20 group-hover:scale-110 transition-transform duration-300 overflow-hidden">
-                          <img
-                            src={skill.icon}
-                            alt={skill.name}
-                            className="w-6 h-6 object-contain transition-all duration-500 filter grayscale group-hover:grayscale-0"
-                          />
+                          {skill.isLucide ? (
+                            <IconComponent className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                          ) : (
+                            <img
+                              src={skill.icon as string}
+                              alt={skill.name}
+                              className="w-6 h-6 object-contain transition-all duration-500 filter grayscale group-hover:grayscale-0"
+                            />
+                          )}
                         </div>
+
                         <div className="flex flex-col justify-center">
                           <h4 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors leading-none mb-1.5">
                             {skill.name}

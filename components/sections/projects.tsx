@@ -1,14 +1,43 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useMemo } from "react";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
+import { Github, ExternalLink, Code2, Rocket } from "lucide-react";
+
 import { ScrollWrapper } from "@/components/scroll-wrapper";
 import { ProjectCard } from "@/components/projects-card";
-import { Github, ExternalLink, Code2 } from "lucide-react";
 import {
   staggerContainerVariants,
   staggerItemVariants,
 } from "@/lib/animations";
+
+/* ======================================================
+   Props & Dynamic Import
+====================================================== */
+interface GitHubCalendarProps {
+  username: string;
+  blockSize?: number;
+  blockMargin?: number;
+  fontSize?: number;
+  theme?: any;
+  colorScheme?: "light" | "dark";
+}
+
+const GitHubCalendar = dynamic<GitHubCalendarProps>(
+  () => import("@/components/github-calendar-client"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex flex-col items-center justify-center gap-3 py-10 opacity-50">
+        <div className="h-4 w-48 bg-zinc-800 animate-pulse rounded-full" />
+        <span className="text-[10px] font-mono animate-pulse uppercase tracking-widest">
+          Synchronizing_Commit_Data...
+        </span>
+      </div>
+    ),
+  },
+);
 
 const githubTheme = {
   light: ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"],
@@ -16,32 +45,6 @@ const githubTheme = {
 };
 
 export function Projects() {
-  const [CalendarComponent, setCalendarComponent] = useState<any>(null);
-
-  useEffect(() => {
-    const loadComponent = async () => {
-      try {
-        const mod = await import("react-github-calendar");
-        const extractedComponent =
-          mod.default?.default ||
-          mod.default ||
-          (mod as any).GitHubCalendar ||
-          mod;
-
-        if (
-          typeof extractedComponent === "function" ||
-          typeof extractedComponent === "object"
-        ) {
-          setCalendarComponent(() => extractedComponent);
-        }
-      } catch (err) {
-        console.error("Failed to load GitHub Calendar:", err);
-      }
-    };
-
-    loadComponent();
-  }, []);
-
   const projects = useMemo(
     () => [
       {
@@ -50,17 +53,17 @@ export function Projects() {
           "An integrated Management and Attendance Information System for Vocational High School industrial internships, featuring real-time tracking and automated reporting.",
         image: "/projects/simpatik.png",
         tags: ["Laravel", "Tailwind", "MySQL", "Livewire", "Alpine.js"],
-        githubUrl: "https://github.com/sakibfaturrahman",
+
         liveUrl: "https://example.com",
-        featured: true,
+        featured: true, // Mengambil 2 kolom di desktop
       },
       {
         title: "PINLAB",
         description:
           "A centralized digital ecosystem designed for equipment lending services, optimizing resource allocation with high-precision database management.",
         image: "/projects/pinlab.png",
+        liveUrl: "https://example.com",
         tags: ["Laravel", "MySQL", "Bootstrap", "Livewire"],
-        githubUrl: "https://github.com/sakibfaturrahman",
       },
       {
         title: "Feeldrop",
@@ -77,7 +80,6 @@ export function Projects() {
           "A robust Laundry Management System featuring QR Code-based order tracking and automated customer notification workflows.",
         image: "/projects/kilatcuci.png",
         tags: ["Laravel", "Bootstrap", "MySQL", "Livewire"],
-        githubUrl: "https://github.com/sakibfaturrahman",
         liveUrl: "https://example.com",
       },
       {
@@ -86,7 +88,7 @@ export function Projects() {
           "An automated online booking platform for gaming centers, featuring secure payment processing via Midtrans Payment Gateway integration.",
         image: "/projects/ps.png",
         tags: ["Laravel", "Tailwind CSS", "MySQL", "Midtrans"],
-        githubUrl: "https://github.com/sakibfaturrahman",
+        liveUrl: "https://example.com",
       },
     ],
     [],
@@ -94,85 +96,83 @@ export function Projects() {
 
   return (
     <section id="projects" className="py-24 md:py-32 relative overflow-hidden">
-      {/* Glow Background Decor */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05)_0%,transparent_70%)] pointer-events-none" />
+      {/* Dekorasi Background */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.03)_0%,transparent_70%)] pointer-events-none" />
 
       <div className="relative max-w-6xl mx-auto px-6">
-        {/* Section Header */}
+        {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
-          <ScrollWrapper className="text-left">
-            <h2 className="text-4xl md:text-5xl font-black text-foreground font-montserrat tracking-tighter">
-              Featured <span className="text-primary">Projects.</span>
+          <ScrollWrapper>
+            <div className="flex items-center gap-2 text-primary mb-4">
+              <Rocket className="w-5 h-5" />
+              <span className="text-sm font-bold tracking-widest uppercase font-mono">
+                Portfolio
+              </span>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-black text-foreground font-montserrat tracking-tighter">
+              Selected <span className="text-primary">Works.</span>
             </h2>
           </ScrollWrapper>
 
           <ScrollWrapper>
-            <motion.div
-              whileHover={{ y: -5 }}
-              className="bg-card/40 backdrop-blur-md border border-border/50 p-4 rounded-2xl flex items-center gap-4 shadow-sm"
-            >
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Github className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest leading-none mb-1">
-                  GitHub Status
-                </p>
-                <p className="text-sm font-bold text-foreground italic">
-                  Active Contributor
-                </p>
-              </div>
-            </motion.div>
+            <p className="text-muted-foreground max-w-xs text-sm md:text-right leading-relaxed italic">
+              "Focusing on backend architecture and seamless user experiences."
+            </p>
           </ScrollWrapper>
         </div>
 
-        {/* GitHub Contribution Activity */}
+        {/* GitHub Activity Card */}
         <ScrollWrapper className="mb-12">
-          <div className="p-6 md:p-8 rounded-3xl bg-zinc-900/40 backdrop-blur-sm border border-border/50 overflow-hidden relative transition-all hover:border-primary/20">
-            <div className="flex flex-col gap-6">
-              <div className="flex items-center gap-3">
-                <Code2 className="text-primary w-5 h-5" />
-                <h3 className="text-sm font-bold font-mono tracking-tight uppercase">
-                  Contribution Graph
-                </h3>
+          <div className="group p-6 md:p-8 rounded-[2.5rem] bg-zinc-900/20 backdrop-blur-md border border-white/5 relative overflow-hidden transition-all hover:border-primary/20">
+            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+              <Github className="w-32 h-32" />
+            </div>
+
+            <div className="relative z-10 flex flex-col gap-8">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <Code2 className="text-primary w-5 h-5" />
+                  </div>
+                  <h3 className="text-sm font-bold font-mono uppercase tracking-widest">
+                    Github_Activity_Log
+                  </h3>
+                </div>
+                <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-[10px] font-bold text-emerald-500 uppercase">
+                    Live Data
+                  </span>
+                </div>
               </div>
 
-              <div className="overflow-x-auto pb-2 custom-scrollbar flex justify-center min-h-[150px]">
-                {CalendarComponent ? (
-                  <CalendarComponent
-                    username="sakibfaturrahman"
-                    blockSize={12}
-                    blockMargin={4}
-                    fontSize={14}
-                    theme={githubTheme}
-                    colorScheme="dark"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center justify-center gap-2 opacity-50">
-                    <div className="h-4 w-48 bg-zinc-800 animate-pulse rounded" />
-                    <span className="text-[10px] font-mono animate-pulse uppercase">
-                      Initialising_Data...
-                    </span>
-                  </div>
-                )}
+              <div className="overflow-x-auto pb-4 custom-scrollbar flex justify-center">
+                <GitHubCalendar
+                  username="sakibfaturrahman"
+                  blockSize={12}
+                  blockMargin={4}
+                  fontSize={13}
+                  theme={githubTheme}
+                  colorScheme="dark"
+                />
               </div>
             </div>
           </div>
         </ScrollWrapper>
 
-        {/* Projects Grid (Bento Style) */}
+        {/* Projects Bento Grid */}
         <motion.div
           variants={staggerContainerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.1 }}
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+          viewport={{ once: true }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {projects.map((project) => (
+          {projects.map((project, index) => (
             <motion.div
               key={project.title}
               variants={staggerItemVariants}
-              className={project.featured ? "md:col-span-2 lg:col-span-2" : ""}
+              className={project.featured ? "md:col-span-2" : "col-span-1"}
             >
               <ProjectCard {...project} />
             </motion.div>
@@ -180,19 +180,18 @@ export function Projects() {
         </motion.div>
 
         {/* Global CTA */}
-        <ScrollWrapper className="text-center mt-20">
+        <ScrollWrapper className="text-center mt-24">
           <motion.a
             href="https://github.com/sakibfaturrahman"
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative inline-flex items-center gap-3 px-10 py-4 bg-primary text-primary-foreground rounded-2xl font-bold overflow-hidden transition-all shadow-xl shadow-primary/20"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="group relative inline-flex items-center gap-4 px-12 py-5 bg-foreground text-background rounded-2xl font-black transition-all hover:bg-primary hover:text-white shadow-2xl"
           >
-            <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-            <Github className="w-5 h-5" />
-            <span>Explore Entire Repository</span>
-            <ExternalLink className="w-4 h-4 opacity-50 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+            <Github className="w-6 h-6" />
+            <span className="text-lg">View More on GitHub</span>
+            <ExternalLink className="w-4 h-4 opacity-50 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
           </motion.a>
         </ScrollWrapper>
       </div>
