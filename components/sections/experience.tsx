@@ -160,7 +160,10 @@ export function Experience() {
         <ScrollWrapper className="mb-20">
           <div className="flex flex-col items-center text-center">
             <h2 className="text-4xl md:text-5xl font-black text-foreground font-montserrat tracking-tighter">
-              Experience & <span className="text-primary">Education.</span>
+              Experience &{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">
+                Education.
+              </span>
             </h2>
             <div className="h-1 w-20 bg-primary/20 mt-6 rounded-full" />
           </div>

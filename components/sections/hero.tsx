@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
+import Image from "next/image";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { Github, Linkedin, Mail, FileText, ArrowRight } from "lucide-react";
+import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import gsap from "gsap";
 import {
@@ -139,7 +140,7 @@ export function Hero() {
                 ref={helloRef}
                 className="text-lg font-medium text-muted-foreground block mb-3"
               >
-                Hello there, I'm
+                Hello there, I&apos;m
               </span>
               <h1 className="text-5xl md:text-7xl font-black tracking-tighter font-montserrat leading-[0.9]">
                 <AnimatedText text="Sakib" />
@@ -152,7 +153,7 @@ export function Hero() {
               variants={fadeUpVariants}
               className="text-lg text-muted-foreground mb-10 max-w-md mx-auto lg:mx-0"
             >
-              Back-End Focused. Building{" "}
+              Back-End Focused Developer. Building{" "}
               <span className="text-primary font-semibold">
                 scalable systems
               </span>{" "}
@@ -163,11 +164,31 @@ export function Hero() {
               variants={fadeUpVariants}
               className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
             >
-              <Button size="lg" className="rounded-xl group bg-primary">
-                <FileText className="mr-2 h-5 w-5" /> Download My Resume
+              <Button asChild size="lg" className="rounded-xl group bg-primary">
+                <a
+                  href="/file/CV%20SAKIB%20FATURRAHMAN.pdf"
+                  download
+                  className="inline-flex items-center"
+                >
+                  <FileText className="mr-2 h-5 w-5" /> Download My Resume
+                </a>
               </Button>
-              <Button variant="outline" size="lg" className="rounded-xl">
-                Contact Me
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="rounded-xl"
+              >
+                <a
+                  href="#contact"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const el = document.getElementById("contact");
+                    if (el) el.scrollIntoView({ behavior: "smooth" });
+                  }}
+                >
+                  Contact Me
+                </a>
               </Button>
             </motion.div>
           </motion.div>
@@ -184,41 +205,45 @@ export function Hero() {
             >
               {/* Glow Aura */}
               <div
-                className={`absolute -inset-10 bg-primary/10 rounded-full blur-3xl transition-opacity duration-1000 ${isHovered ? "opacity-100" : "opacity-30"}`}
+                className={`absolute -inset-10 bg-primary/10 rounded-full blur-3xl transition-opacity duration-1000 ${
+                  isHovered ? "opacity-100" : "opacity-30"
+                }`}
               />
 
               <div className="relative w-72 h-72 md:w-96 md:h-96 lg:w-[420px] lg:h-[420px] rounded-[3rem] overflow-hidden border-[6px] border-card shadow-2xl transition-transform duration-500 hover:rotate-0 rotate-2 bg-zinc-900">
-                {/* Layer 1: Base Image */}
-                <img
+                {/* Layer 1: BASE IMAGE (Hitam Putih - Selalu Terlihat Terang) */}
+                <Image
                   src="/images/porto.webp"
-                  className={`w-full h-full object-cover transition-all duration-500 ${
-                    isMobile
-                      ? "grayscale-0 opacity-100 brightness-100"
-                      : "grayscale opacity-30 brightness-50"
-                  }`}
-                  alt="Background"
+                  alt="Background Profile"
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 288px, (max-width: 1024px) 384px, 420px"
+                  className="object-cover grayscale brightness-100 opacity-100 transition-all duration-500"
                 />
 
-                {/* Layer 2: Colored Image (Hanya aktif di Desktop) */}
+                {/* Layer 2: COLORED IMAGE (Muncul Mengikuti Kursor) */}
                 {!isMobile && (
                   <motion.div
-                    className="absolute inset-0 pointer-events-none"
+                    className="absolute inset-0 pointer-events-none z-10"
                     animate={
                       {
-                        WebkitMaskImage: isHovered
-                          ? `radial-gradient(circle 100px at ${spotlightPos.x}% ${spotlightPos.y}%, black 20%, transparent 100%)`
-                          : `radial-gradient(circle 0px at ${spotlightPos.x}% ${spotlightPos.y}%, black 0%, transparent 0%)`,
-                        maskImage: isHovered
-                          ? `radial-gradient(circle 100px at ${spotlightPos.x}% ${spotlightPos.y}%, black 20%, transparent 100%)`
-                          : `radial-gradient(circle 0px at ${spotlightPos.x}% ${spotlightPos.y}%, black 0%, transparent 0%)`,
+                        // Muncul hanya saat hover
+                        opacity: isHovered ? 1 : 0,
+                        WebkitMaskImage: `radial-gradient(circle 120px at ${spotlightPos.x}% ${spotlightPos.y}%, black 40%, transparent 100%)`,
+                        maskImage: `radial-gradient(circle 120px at ${spotlightPos.x}% ${spotlightPos.y}%, black 40%, transparent 100%)`,
                       } as any
                     }
-                    transition={{ type: "tween", ease: "circOut", duration: 0 }}
+                    transition={{
+                      type: "tween",
+                      ease: "circOut",
+                      duration: 0.2,
+                    }}
                   >
-                    <img
+                    <Image
                       src="/images/porto.webp"
-                      className="w-full h-full object-cover"
-                      alt="Foreground"
+                      alt="Colored Profile"
+                      fill
+                      className="object-cover grayscale-0 brightness-110"
                     />
                   </motion.div>
                 )}
@@ -232,9 +257,14 @@ export function Hero() {
               >
                 <span className="text-sm font-bold flex items-center gap-2">
                   <div
-                    className={`w-2 h-2 rounded-full ${isHovered ? "bg-primary animate-pulse" : "bg-zinc-500"}`}
+                    className={`w-2 h-2 rounded-full ${
+                      isHovered ? "bg-green-500 animate-pulse" : "bg-zinc-500"
+                    }`}
                   />
-                  Fullstack Dev
+                  Fullstack
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">
+                    Developer.
+                  </span>
                 </span>
               </motion.div>
             </motion.div>

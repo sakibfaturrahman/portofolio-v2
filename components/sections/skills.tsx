@@ -141,7 +141,10 @@ export function Skills() {
             <ScrollWrapper>
               <h2 className="text-3xl md:text-5xl font-black text-foreground font-montserrat tracking-tighter mb-6">
                 Tools & <br className="hidden lg:block" />
-                <span className="text-primary">Techstack.</span>
+                <span className="text-primary">Tech</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">
+                  stack.
+                </span>
               </h2>
               <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-8 max-w-md mx-auto lg:mx-0">
                 A curated selection of technologies I leverage to build robust,

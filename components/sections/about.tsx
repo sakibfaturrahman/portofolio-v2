@@ -63,7 +63,10 @@ export function About() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div className="space-y-2">
               <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-foreground font-montserrat">
-                Personal <span className="text-primary">Narrative.</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">
+                  Personal
+                </span>{" "}
+                <span className="text-primary">Narrative.</span>
               </h2>
               <div className="h-1.5 w-24 bg-primary rounded-full" />
             </div>

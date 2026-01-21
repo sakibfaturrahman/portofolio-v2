@@ -1,16 +1,15 @@
 "use client";
 
-import React from "react";
-
-import { useState } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Mail,
   MapPin,
   Phone,
   Send,
   CheckCircle,
-  AlertCircle,
+  MessageSquare,
+  ArrowRight,
 } from "lucide-react";
 import { ScrollWrapper } from "@/components/scroll-wrapper";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,316 +26,269 @@ const contactInfo = [
   {
     icon: Mail,
     label: "Email",
-    value: "sakib@example.com",
-    href: "mailto:sakib@example.com",
+    value: "sakibfaturrahman92@gmail.com",
+    href: "mailto:sakibfaturrahman92@gmail.com",
+    color: "bg-blue-500/10 text-blue-500",
   },
   {
     icon: Phone,
     label: "Phone",
-    value: "+62 812 3456 7890",
-    href: "tel:+6281234567890",
+    value: "+62 851 7958 4795",
+    href: "tel:+6285179584795",
+    color: "bg-emerald-500/10 text-emerald-500",
   },
   {
     icon: MapPin,
     label: "Location",
-    value: "Indonesia",
+    value: "Tasikmalaya, Indonesia",
     href: null,
+    color: "bg-orange-500/10 text-orange-500",
   },
 ];
 
-interface FormData {
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-}
-
-interface FormErrors {
-  name?: string;
-  email?: string;
-  subject?: string;
-  message?: string;
-}
-
 export function Contact() {
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState({
     name: "",
     email: "",
     subject: "",
     message: "",
   });
-  const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(
     null,
   );
 
-  // Validation function
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email";
-    }
-
-    if (!formData.subject.trim()) {
-      newErrors.subject = "Subject is required";
-    }
-
-    if (!formData.message.trim()) {
-      newErrors.message = "Message is required";
-    } else if (formData.message.length < 10) {
-      newErrors.message = "Message must be at least 10 characters";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const mouseX = useRef(0);
+  const mouseY = useRef(0);
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const { currentTarget, clientX, clientY } = e;
+    const { left, top } = currentTarget.getBoundingClientRect();
+    mouseX.current = clientX - left;
+    mouseY.current = clientY - top;
+    (currentTarget as HTMLElement).style.setProperty(
+      "--mouse-x",
+      `${mouseX.current}px`,
+    );
+    (currentTarget as HTMLElement).style.setProperty(
+      "--mouse-y",
+      `${mouseY.current}px`,
+    );
   };
 
-  // Handle input change
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
-    if (errors[name as keyof FormErrors]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
-    }
   };
 
-  // Handle form submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) return;
-
     setIsSubmitting(true);
-    setSubmitStatus(null);
-
-    // Simulate form submission
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      setSubmitStatus("success");
-      setFormData({ name: "", email: "", subject: "", message: "" });
-    } catch {
-      setSubmitStatus("error");
-    } finally {
-      setIsSubmitting(false);
-    }
+    await new Promise((r) => setTimeout(r, 2000));
+    setSubmitStatus("success");
+    setIsSubmitting(false);
+    setFormData({ name: "", email: "", subject: "", message: "" });
   };
 
   return (
-    <section id="contact" className="py-20 md:py-32 relative">
-      <div className="max-w-6xl mx-auto px-6">
-        {/* Section Header */}
-        <ScrollWrapper className="text-center mb-16">
-          <p className="text-sm uppercase tracking-widest text-primary mb-4">
-            Get In Touch
-          </p>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground text-balance">
-            {"Let's Work Together"}
-          </h2>
-          <p className="text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">
-            Have a project in mind or want to discuss opportunities?
-            {"I'd love to hear from you."}
-          </p>
-        </ScrollWrapper>
+    <section
+      id="contact"
+      className="py-24 md:py-32 relative overflow-hidden bg-background"
+    >
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
 
-        <div className="grid lg:grid-cols-5 gap-12">
-          {/* Contact Info */}
-          <motion.div
-            variants={staggerContainerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: false, amount: 0.3 }}
-            className="lg:col-span-2 space-y-6"
-          >
-            {contactInfo.map((info) => (
-              <motion.div key={info.label} variants={staggerItemVariants}>
-                <Card className="bg-card/50 border-border hover:border-primary/50 transition-colors">
-                  <CardContent className="p-6">
-                    {info.href ? (
-                      <a
-                        href={info.href}
-                        className="flex items-start gap-4 group"
-                      >
-                        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
-                          <info.icon className="w-6 h-6 text-primary" />
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground mb-1">
-                            {info.label}
-                          </p>
-                          <p className="text-foreground font-medium group-hover:text-primary transition-colors">
-                            {info.value}
-                          </p>
-                        </div>
-                      </a>
-                    ) : (
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                          <info.icon className="w-6 h-6 text-primary" />
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground mb-1">
-                            {info.label}
-                          </p>
-                          <p className="text-foreground font-medium">
-                            {info.value}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-
-            {/* Additional Info */}
+      <div className="max-w-6xl mx-auto px-6 relative z-10">
+        <div className="grid lg:grid-cols-12 gap-16 items-start">
+          {/* Bagian Kiri (Tetap) */}
+          <div className="lg:col-span-5 space-y-12">
             <ScrollWrapper>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                {"I'm"} currently available for freelance work and full-time
-                opportunities. {"Let's"} build something amazing together!
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6">
+                <MessageSquare className="w-4 h-4 text-primary" />
+                <span className="text-xs font-bold tracking-widest uppercase text-primary">
+                  Contact
+                </span>
+              </div>
+              <h2 className="text-5xl md:text-6xl font-black text-foreground tracking-tighter leading-[0.9] mb-6">
+                Let&apos;s Build <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-400 to-emerald-400">
+                  Greatness.
+                </span>
+              </h2>
+              <p className="text-muted-foreground text-lg max-w-md">
+                Ready to elevate your digital presence? Send me a message and
+                let&apos;s turn your vision into a high-performance reality.
               </p>
             </ScrollWrapper>
-          </motion.div>
 
-          {/* Contact Form */}
-          <ScrollWrapper className="lg:col-span-3">
-            <Card className="bg-card/50 border-border">
-              <CardContent className="p-6 md:p-8">
+            <motion.div
+              variants={staggerContainerVariants}
+              initial="hidden"
+              whileInView="visible"
+              className="space-y-4"
+            >
+              {contactInfo.map((info, idx) => (
+                <motion.div key={idx} variants={staggerItemVariants}>
+                  <a
+                    href={info.href || "#"}
+                    className="group flex items-center p-4 rounded-2xl bg-zinc-900/50 border border-white/5 hover:border-primary/50 hover:bg-zinc-900 transition-all duration-300 shadow-xl"
+                  >
+                    <div
+                      className={`w-12 h-12 rounded-xl ${info.color} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}
+                    >
+                      <info.icon className="w-6 h-6" />
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
+                        {info.label}
+                      </p>
+                      <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                        {info.value}
+                      </p>
+                    </div>
+                    <ArrowRight className="ml-auto w-4 h-4 text-zinc-700 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  </a>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* Bagian Form (Pembaruan dengan Radius) */}
+          <ScrollWrapper className="lg:col-span-7">
+            <Card
+              onMouseMove={handleMouseMove}
+              className="relative group bg-zinc-900/40 border-white/5 backdrop-blur-xl rounded-[2.5rem] overflow-hidden shadow-2xl"
+            >
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                style={{
+                  background: `radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(var(--primary-rgb), 0.1), transparent 40%)`,
+                }}
+              />
+
+              <CardContent className="p-8 md:p-12">
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Name & Email Row */}
-                  <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="name">Name</Label>
+                      <Label
+                        htmlFor="name"
+                        className="text-xs uppercase tracking-widest font-bold ml-1 text-zinc-400"
+                      >
+                        Full Name
+                      </Label>
                       <Input
                         id="name"
                         name="name"
-                        placeholder="Your name"
+                        required
                         value={formData.name}
                         onChange={handleChange}
-                        className={errors.name ? "border-destructive" : ""}
+                        className="h-14 bg-white/[0.03] border-white/10 rounded-2xl focus-visible:ring-primary/50 focus-visible:border-primary transition-all text-sm"
+                        placeholder="Enter your name"
                       />
-                      {errors.name && (
-                        <p className="text-xs text-destructive flex items-center gap-1">
-                          <AlertCircle className="w-3 h-3" />
-                          {errors.name}
-                        </p>
-                      )}
                     </div>
+
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
+                      <Label
+                        htmlFor="email"
+                        className="text-xs uppercase tracking-widest font-bold ml-1 text-zinc-400"
+                      >
+                        Email Address
+                      </Label>
                       <Input
                         id="email"
-                        name="email"
                         type="email"
-                        placeholder="your@email.com"
+                        name="email"
+                        required
                         value={formData.email}
                         onChange={handleChange}
-                        className={errors.email ? "border-destructive" : ""}
+                        className="h-14 bg-white/[0.03] border-white/10 rounded-2xl focus-visible:ring-primary/50 focus-visible:border-primary transition-all text-sm"
+                        placeholder="your@email.com"
                       />
-                      {errors.email && (
-                        <p className="text-xs text-destructive flex items-center gap-1">
-                          <AlertCircle className="w-3 h-3" />
-                          {errors.email}
-                        </p>
-                      )}
                     </div>
                   </div>
 
-                  {/* Subject */}
                   <div className="space-y-2">
-                    <Label htmlFor="subject">Subject</Label>
+                    <Label
+                      htmlFor="subject"
+                      className="text-xs uppercase tracking-widest font-bold ml-1 text-zinc-400"
+                    >
+                      Project Subject
+                    </Label>
                     <Input
                       id="subject"
                       name="subject"
-                      placeholder="What's this about?"
+                      required
                       value={formData.subject}
                       onChange={handleChange}
-                      className={errors.subject ? "border-destructive" : ""}
+                      className="h-14 bg-white/[0.03] border-white/10 rounded-2xl focus-visible:ring-primary/50 focus-visible:border-primary transition-all text-sm"
+                      placeholder="What are we building?"
                     />
-                    {errors.subject && (
-                      <p className="text-xs text-destructive flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" />
-                        {errors.subject}
-                      </p>
-                    )}
                   </div>
 
-                  {/* Message */}
                   <div className="space-y-2">
-                    <Label htmlFor="message">Message</Label>
+                    <Label
+                      htmlFor="message"
+                      className="text-xs uppercase tracking-widest font-bold ml-1 text-zinc-400"
+                    >
+                      Message Details
+                    </Label>
                     <Textarea
                       id="message"
                       name="message"
-                      placeholder="Tell me about your project..."
-                      rows={5}
+                      required
                       value={formData.message}
                       onChange={handleChange}
-                      className={errors.message ? "border-destructive" : ""}
+                      rows={5}
+                      className="bg-white/[0.03] border-white/10 rounded-3xl focus-visible:ring-primary/50 focus-visible:border-primary transition-all text-sm resize-none p-5"
+                      placeholder="Tell me more about your vision..."
                     />
-                    {errors.message && (
-                      <p className="text-xs text-destructive flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" />
-                        {errors.message}
-                      </p>
-                    )}
                   </div>
 
-                  {/* Submit Button */}
                   <Button
                     type="submit"
-                    size="lg"
-                    className="w-full group"
                     disabled={isSubmitting}
+                    className="w-full h-16 rounded-2xl bg-foreground text-background hover:bg-primary hover:text-white transition-all duration-500 group relative overflow-hidden"
                   >
-                    {isSubmitting ? (
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{
-                          duration: 1,
-                          repeat: Infinity,
-                          ease: "linear",
-                        }}
-                        className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full"
-                      />
-                    ) : (
-                      <>
-                        Send Message
-                        <Send className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
-                      </>
-                    )}
+                    <AnimatePresence mode="wait">
+                      {isSubmitting ? (
+                        <motion.div
+                          key="loading"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          className="flex items-center gap-3"
+                        >
+                          <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          <span className="font-bold uppercase tracking-widest text-xs">
+                            Transmitting...
+                          </span>
+                        </motion.div>
+                      ) : submitStatus === "success" ? (
+                        <motion.div
+                          key="success"
+                          initial={{ y: 20 }}
+                          animate={{ y: 0 }}
+                          className="flex items-center gap-2"
+                        >
+                          <CheckCircle className="w-5 h-5 text-emerald-400" />
+                          <span className="font-bold uppercase tracking-widest text-xs">
+                            Message Received!
+                          </span>
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="idle"
+                          className="flex items-center gap-2"
+                        >
+                          <span className="font-bold uppercase tracking-widest text-xs">
+                            Launch Message
+                          </span>
+                          <Send className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </Button>
-
-                  {/* Status Messages */}
-                  {submitStatus === "success" && (
-                    <motion.p
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-sm text-green-500 flex items-center gap-2"
-                    >
-                      <CheckCircle className="w-4 h-4" />
-                      Message sent successfully! {"I'll"} get back to you soon.
-                    </motion.p>
-                  )}
-                  {submitStatus === "error" && (
-                    <motion.p
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-sm text-destructive flex items-center gap-2"
-                    >
-                      <AlertCircle className="w-4 h-4" />
-                      Something went wrong. Please try again.
-                    </motion.p>
-                  )}
                 </form>
               </CardContent>
             </Card>
