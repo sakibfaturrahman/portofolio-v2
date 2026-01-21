@@ -1,0 +1,117 @@
+{
+  "general": {
+    "assistant_name": "NexaOrion",
+    "tagline": "Personal Knowledge Core",
+    "capabilities": [
+      "Profile summary",
+      "Tech stack overview",
+      "Project showcase",
+      "Experience details"
+    ]
+  },
+  "personal_info": {
+    "name": "Sakib Faturrahman",
+    "title": "Back-End Developer / Junior Web Developer",
+    "location": "Tasikmalaya, Jawa Barat",
+    "email": "sakibfaturrahman92@gmail.com",
+    "phone": "+6281933340862",
+    "website": "https://sakibftrrhmn.vercel.app",
+    "about_me": "Lulusan SMK Rekayasa Perangkat Lunak (RPL) dengan spesialisasi pengembangan web sisi Back-End. Saat ini sedang menempuh pendidikan S1 Teknik Informatika sambil terus mengasah keterampilan dalam mencari solusi teknis terbaik untuk setiap proyek."
+  },
+
+  "education": [
+    {
+      "institution": "Universitas Perjuangan Tasikmalaya",
+      "degree": "S1 Teknik Informatika",
+      "period": "2024 - Sekarang",
+      "status": "Mahasiswa Semester 3"
+    },
+    {
+      "institution": "SMK Daarul Abroor",
+      "major": "Rekayasa Perangkat Lunak",
+      "period": "2021 - 2024"
+    }
+  ],
+
+  "experience": [
+    {
+      "position": "Freelance Junior Web Developer",
+      "company": "FtrTech ID",
+      "period": "2024 - Sekarang",
+      "responsibilities": [
+        "Analisis kebutuhan, desain, pengembangan, hingga deployment proyek web",
+        "Komunikasi langsung dengan klien untuk memastikan hasil sesuai kebutuhan"
+      ]
+    },
+    {
+      "position": "Junior Web Developer (Internship)",
+      "company": "CV Abdi Creative Technology",
+      "period": "Maret 2023 - Juli 2023",
+      "responsibilities": [
+        "Mengembangkan aplikasi manajemen perpustakaan",
+        "Membangun REST API CRUD berbasis JSON",
+        "Implementasi autentikasi dan middleware keamanan"
+      ]
+    }
+  ],
+
+  "projects": [
+    {
+      "name": "SIMPATIK",
+      "description": "Sistem Informasi Manajemen dan Presensi Praktik Industri dan Kerja",
+      "tech_stack": ["Laravel", "MySQL", "Bootstrap"]
+    },
+    {
+      "name": "KilatCuci",
+      "description": "Aplikasi Pengelolaan Laundry dengan QR Code",
+      "tech_stack": ["Laravel", "MySQL"]
+    }
+  ],
+
+  "skills": {
+    "hard_skills": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "PHP",
+      "Laravel",
+      "React.js",
+      "Next.js",
+      "Express.js",
+      "MySQL",
+      "MongoDB",
+      "Supabase"
+    ],
+    "soft_skills": ["Komunikasi", "Kerjasama Tim", "Problem Solving"]
+  },
+
+  "general_knowledge": {
+    "what_is_web_dev": "Web development adalah proses membangun dan memelihara website atau aplikasi web, mencakup front-end, back-end, dan database.",
+    "backend_definition": "Back-end adalah bagian sistem yang menangani logika bisnis, database, dan komunikasi server.",
+    "rest_api": "REST API adalah standar komunikasi berbasis HTTP yang menggunakan format JSON.",
+    "mvc_pattern": "MVC (Model-View-Controller) adalah arsitektur yang memisahkan logika, tampilan, dan data.",
+    "git_definition": "Git adalah sistem version control untuk melacak perubahan kode secara kolaboratif."
+  },
+
+  "faq": {
+    "services": "Sakib menerima jasa pembuatan website, sistem informasi, REST API, dan maintenance aplikasi.",
+    "availability": "Saat ini tersedia untuk freelance project dan kerja sama jangka pendek.",
+    "remote_work": "Terbuka untuk kerja remote maupun onsite (wilayah Tasikmalaya dan sekitarnya).",
+    "pricing": "Harga project disesuaikan dengan kompleksitas dan kebutuhan klien.",
+    "tech_preference": "Teknologi utama yang digunakan adalah Laravel dan Next.js."
+  },
+
+  "quick_actions": {
+    "about": "Saya adalah Sakib Faturrahman, Back-End Developer dengan fokus pada Laravel dan REST API.",
+    "skills": "Keahlian utama saya meliputi Laravel, MySQL, Next.js, dan Express.js.",
+    "projects": "Saya telah mengerjakan SIMPATIK, KilatCuci, Rental PS Online, dan aplikasi POS.",
+    "contact": "Silakan hubungi saya melalui email atau WhatsApp untuk kerja sama.",
+    "education": "Saat ini saya sedang menempuh S1 Teknik Informatika di Universitas Perjuangan Tasikmalaya."
+  },
+
+  "system_responses": {
+    "unknown": "Wah, pertanyaan yang menarik! Sayangnya, sistem saya belum punya data soal itu. Tapi kalau kamu tanya soal perjalanan coding Sakib atau rahasia di balik project-project kerennya, saya siap jawab dengan semangat 45! Ayo, tanya yang lain! 🚀🔥",
+    "error": "Ouch! Ada kabel virtual yang sedikit korslet nih! ⚡ Tapi tenang saja, saya sedang berusaha memperbaikinya secepat kilat supaya kita bisa lanjut ngobrol seru lagi. Coba sekali lagi yuk, semangat! 🛠️✨",
+    "maintenance": "Sistem sedang dalam mode upgrade super! 🌟 Sakib lagi kasih saya 'bahan bakar' baru supaya saya makin pintar dan asik buat nemenin kamu. Tunggu sebentar ya, saya akan kembali lebih hebat dari sebelumnya! 🔋💪"
+  }
+}
