@@ -2,12 +2,14 @@
 
 import React, { useEffect, useRef, useState } from "react";
 
+// --- Utility Classes ---
 class Oscillator {
   phase: number;
   offset: number;
   frequency: number;
   amplitude: number;
   value: number;
+
   constructor(options: any) {
     this.phase = options.phase || 0;
     this.offset = options.offset || 0;
@@ -15,6 +17,7 @@ class Oscillator {
     this.amplitude = options.amplitude || 1;
     this.value = 0;
   }
+
   update() {
     this.phase += this.frequency;
     this.value = this.offset + Math.sin(this.phase) * this.amplitude;
@@ -33,6 +36,7 @@ class Line {
   spring: number;
   friction: number;
   nodes: Node[];
+
   constructor(
     options: { spring: number },
     settings: any,
@@ -48,11 +52,13 @@ class Line {
       this.nodes.push(node);
     }
   }
+
   update(pos: { x: number; y: number }, settings: any) {
     let e = this.spring;
     const t = this.nodes[0];
     t.vx += (pos.x - t.x) * e;
     t.vy += (pos.y - t.y) * e;
+
     for (let i = 0, a = this.nodes.length; i < a; i++) {
       const node = this.nodes[i];
       if (i > 0) {
@@ -69,6 +75,7 @@ class Line {
       e *= settings.tension;
     }
   }
+
   draw(ctx: CanvasRenderingContext2D) {
     let n = this.nodes[0].x;
     let i = this.nodes[0].y;
@@ -90,27 +97,48 @@ class Line {
   }
 }
 
+// --- Main Component ---
 export default function CustomCursor() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [active, setActive] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    // Fungsi untuk cek apakah device mobile
+    const checkDevice = () => {
+      const mobileQuery = window.matchMedia("(max-width: 1024px)").matches;
+      const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+      setIsMobile(mobileQuery || hasTouch);
+    };
+
+    checkDevice();
+    window.addEventListener("resize", checkDevice);
+
+    // Observer untuk mengaktifkan kursor hanya di section hero/about
     const handleIntersect = (entries: IntersectionObserverEntry[]) => {
       const isVisible = entries.some((entry) => entry.isIntersecting);
       setActive(isVisible);
     };
+
     const observer = new IntersectionObserver(handleIntersect, {
       threshold: 0.1,
     });
+
     const targets = ["hero", "about"]
       .map((id) => document.getElementById(id))
       .filter((el) => el !== null);
+
     targets.forEach((target) => observer.observe(target!));
-    return () => observer.disconnect();
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", checkDevice);
+    };
   }, []);
 
   useEffect(() => {
-    if (!active) return;
+    // Hentikan semua logika jika mobile atau sedang tidak aktif (luar section)
+    if (!active || isMobile) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -127,6 +155,7 @@ export default function CustomCursor() {
     const pos = { x: 0, y: 0 };
     let lines: Line[] = [];
     let running = true;
+    let animationFrameId: number;
 
     const hueOscillator = new Oscillator({
       phase: Math.random() * 2 * Math.PI,
@@ -140,12 +169,9 @@ export default function CustomCursor() {
       canvas.height = window.innerHeight;
     };
 
-    const onMouseMove = (e: MouseEvent | TouchEvent) => {
-      const source = (e as TouchEvent).touches
-        ? (e as TouchEvent).touches[0]
-        : (e as MouseEvent);
-      pos.x = source.clientX;
-      pos.y = source.clientY;
+    const onMouseMove = (e: MouseEvent) => {
+      pos.x = e.clientX;
+      pos.y = e.clientY;
 
       if (lines.length === 0) {
         for (let i = 0; i < settings.trails; i++) {
@@ -161,9 +187,9 @@ export default function CustomCursor() {
     };
 
     const render = () => {
-      if (!running || !active) return;
+      if (!running || !active || isMobile) return;
 
-      // Deteksi apakah kursor berada di atas area gambar (data-hide-cursor)
+      // Cek apakah kursor sedang hover di elemen dengan data-hide-cursor="true"
       const elementAtPos = document.elementFromPoint(pos.x, pos.y);
       const shouldHide = elementAtPos?.closest("[data-hide-cursor]");
 
@@ -183,23 +209,25 @@ export default function CustomCursor() {
           }
         }
       }
-      requestAnimationFrame(render);
+      animationFrameId = requestAnimationFrame(render);
     };
 
     window.addEventListener("resize", resizeCanvas);
     window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("touchstart", onMouseMove);
 
     resizeCanvas();
     render();
 
     return () => {
       running = false;
+      cancelAnimationFrame(animationFrameId);
       window.removeEventListener("resize", resizeCanvas);
       window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("touchstart", onMouseMove);
     };
-  }, [active]);
+  }, [active, isMobile]);
+
+  // Jika mobile, jangan render canvas untuk menghemat performa
+  if (isMobile) return null;
 
   return (
     <canvas

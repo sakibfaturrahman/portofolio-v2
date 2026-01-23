@@ -17,10 +17,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import {
-  staggerContainerVariants,
-  staggerItemVariants,
-} from "@/lib/animations";
+
+// Varian yang lebih ringan (tanpa spring yang berat)
+const lightItemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
 
 const contactInfo = [
   {
@@ -54,25 +56,16 @@ export function Contact() {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(
-    null,
-  );
+  const [submitStatus, setSubmitStatus] = useState<"success" | null>(null);
 
-  const mouseX = useRef(0);
-  const mouseY = useRef(0);
-  const handleMouseMove = (e: React.MouseEvent) => {
+  // Optimasi Mouse Move: Menggunakan CSS Variables secara langsung
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const { currentTarget, clientX, clientY } = e;
     const { left, top } = currentTarget.getBoundingClientRect();
-    mouseX.current = clientX - left;
-    mouseY.current = clientY - top;
-    (currentTarget as HTMLElement).style.setProperty(
-      "--mouse-x",
-      `${mouseX.current}px`,
-    );
-    (currentTarget as HTMLElement).style.setProperty(
-      "--mouse-y",
-      `${mouseY.current}px`,
-    );
+    const x = clientX - left;
+    const y = clientY - top;
+    currentTarget.style.setProperty("--x", `${x}px`);
+    currentTarget.style.setProperty("--y", `${y}px`);
   };
 
   const handleChange = (
@@ -85,97 +78,98 @@ export function Contact() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    await new Promise((r) => setTimeout(r, 2000));
+    await new Promise((r) => setTimeout(r, 1500));
     setSubmitStatus("success");
     setIsSubmitting(false);
     setFormData({ name: "", email: "", subject: "", message: "" });
+    setTimeout(() => setSubmitStatus(null), 3000);
   };
 
   return (
     <section
       id="contact"
-      className="py-24 md:py-32 relative overflow-hidden bg-background"
+      className="py-20 md:py-28 relative overflow-hidden bg-background"
     >
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
+      {/* Static Glows (Lebih ringan daripada blur dinamis besar) */}
+      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="max-w-6xl mx-auto px-6 relative z-10">
-        <div className="grid lg:grid-cols-12 gap-16 items-start">
-          {/* Bagian Kiri (Tetap) */}
-          <div className="lg:col-span-5 space-y-12">
+        <div className="grid lg:grid-cols-12 gap-12 items-start">
+          {/* Sisi Kiri: Info */}
+          <div className="lg:col-span-5 space-y-10">
             <ScrollWrapper>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-4">
                 <MessageSquare className="w-4 h-4 text-primary" />
-                <span className="text-xs font-bold tracking-widest uppercase text-primary">
+                <span className="text-[10px] font-bold tracking-widest uppercase text-primary">
                   Contact
                 </span>
               </div>
-              <h2 className="text-5xl md:text-6xl font-black text-foreground tracking-tighter leading-[0.9] mb-6">
+              <h2 className="text-5xl md:text-6xl font-black text-foreground tracking-tighter leading-none mb-6">
                 Let&apos;s Build <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-400 to-emerald-400">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">
                   Greatness.
                 </span>
               </h2>
-              <p className="text-muted-foreground text-lg max-w-md">
+              <p className="text-muted-foreground text-base max-w-sm">
                 Ready to elevate your digital presence? Send me a message and
-                let&apos;s turn your vision into a high-performance reality.
+                let&apos;s turn your vision into reality.
               </p>
             </ScrollWrapper>
 
-            <motion.div
-              variants={staggerContainerVariants}
-              initial="hidden"
-              whileInView="visible"
-              className="space-y-4"
-            >
+            <div className="space-y-3">
               {contactInfo.map((info, idx) => (
-                <motion.div key={idx} variants={staggerItemVariants}>
+                <motion.div
+                  key={idx}
+                  variants={lightItemVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                >
                   <a
                     href={info.href || "#"}
-                    className="group flex items-center p-4 rounded-2xl bg-zinc-900/50 border border-white/5 hover:border-primary/50 hover:bg-zinc-900 transition-all duration-300 shadow-xl"
+                    className="group flex items-center p-4 rounded-2xl bg-zinc-900/30 border border-white/5 hover:border-primary/30 transition-colors will-change-transform"
                   >
                     <div
-                      className={`w-12 h-12 rounded-xl ${info.color} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}
+                      className={`w-10 h-10 rounded-xl ${info.color} flex items-center justify-center shrink-0`}
                     >
-                      <info.icon className="w-6 h-6" />
+                      <info.icon className="w-5 h-5" />
                     </div>
                     <div className="ml-4">
-                      <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
+                      <p className="text-[9px] uppercase tracking-widest text-zinc-500 font-bold">
                         {info.label}
                       </p>
-                      <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                      <p className="text-sm font-medium text-zinc-200 group-hover:text-primary transition-colors">
                         {info.value}
                       </p>
                     </div>
-                    <ArrowRight className="ml-auto w-4 h-4 text-zinc-700 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                    <ArrowRight className="ml-auto w-4 h-4 text-zinc-800 group-hover:text-primary group-hover:translate-x-1 transition-all" />
                   </a>
                 </motion.div>
               ))}
-            </motion.div>
+            </div>
           </div>
 
-          {/* Bagian Form (Pembaruan dengan Radius) */}
+          {/* Sisi Kanan: Form */}
           <ScrollWrapper className="lg:col-span-7">
             <Card
               onMouseMove={handleMouseMove}
-              className="relative group bg-zinc-900/40 border-white/5 backdrop-blur-xl rounded-[2.5rem] overflow-hidden shadow-2xl"
+              className="relative bg-zinc-900/40 border-white/5 backdrop-blur-md rounded-[2rem] overflow-hidden shadow-xl will-change-transform"
+              style={
+                {
+                  // Efek sorot menggunakan variabel CSS (0 CPU lag)
+                  backgroundImage: `radial-gradient(circle at var(--x) var(--y), rgba(59, 130, 246, 0.05) 0%, transparent 50%)`,
+                } as any
+              }
             >
-              <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                style={{
-                  background: `radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(var(--primary-rgb), 0.1), transparent 40%)`,
-                }}
-              />
-
-              <CardContent className="p-8 md:p-12">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
+              <CardContent className="p-8 md:p-10">
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div className="grid md:grid-cols-2 gap-5">
+                    <div className="space-y-1.5">
                       <Label
                         htmlFor="name"
-                        className="text-xs uppercase tracking-widest font-bold ml-1 text-zinc-400"
+                        className="text-[10px] uppercase tracking-widest font-bold text-zinc-500 ml-1"
                       >
-                        Full Name
+                        Name
                       </Label>
                       <Input
                         id="name"
@@ -183,17 +177,16 @@ export function Contact() {
                         required
                         value={formData.name}
                         onChange={handleChange}
-                        className="h-14 bg-white/[0.03] border-white/10 rounded-2xl focus-visible:ring-primary/50 focus-visible:border-primary transition-all text-sm"
-                        placeholder="Enter your name"
+                        className="h-12 bg-white/[0.02] border-white/10 rounded-xl focus-visible:ring-primary/30 transition-all text-sm"
+                        placeholder="Your Name"
                       />
                     </div>
-
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       <Label
                         htmlFor="email"
-                        className="text-xs uppercase tracking-widest font-bold ml-1 text-zinc-400"
+                        className="text-[10px] uppercase tracking-widest font-bold text-zinc-500 ml-1"
                       >
-                        Email Address
+                        Email
                       </Label>
                       <Input
                         id="email"
@@ -202,18 +195,18 @@ export function Contact() {
                         required
                         value={formData.email}
                         onChange={handleChange}
-                        className="h-14 bg-white/[0.03] border-white/10 rounded-2xl focus-visible:ring-primary/50 focus-visible:border-primary transition-all text-sm"
-                        placeholder="your@email.com"
+                        className="h-12 bg-white/[0.02] border-white/10 rounded-xl focus-visible:ring-primary/30 transition-all text-sm"
+                        placeholder="hello@example.com"
                       />
                     </div>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <Label
                       htmlFor="subject"
-                      className="text-xs uppercase tracking-widest font-bold ml-1 text-zinc-400"
+                      className="text-[10px] uppercase tracking-widest font-bold text-zinc-500 ml-1"
                     >
-                      Project Subject
+                      Subject
                     </Label>
                     <Input
                       id="subject"
@@ -221,17 +214,17 @@ export function Contact() {
                       required
                       value={formData.subject}
                       onChange={handleChange}
-                      className="h-14 bg-white/[0.03] border-white/10 rounded-2xl focus-visible:ring-primary/50 focus-visible:border-primary transition-all text-sm"
-                      placeholder="What are we building?"
+                      className="h-12 bg-white/[0.02] border-white/10 rounded-xl focus-visible:ring-primary/30 transition-all text-sm"
+                      placeholder="Project Inquiry"
                     />
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <Label
                       htmlFor="message"
-                      className="text-xs uppercase tracking-widest font-bold ml-1 text-zinc-400"
+                      className="text-[10px] uppercase tracking-widest font-bold text-zinc-500 ml-1"
                     >
-                      Message Details
+                      Message
                     </Label>
                     <Textarea
                       id="message"
@@ -239,16 +232,16 @@ export function Contact() {
                       required
                       value={formData.message}
                       onChange={handleChange}
-                      rows={5}
-                      className="bg-white/[0.03] border-white/10 rounded-3xl focus-visible:ring-primary/50 focus-visible:border-primary transition-all text-sm resize-none p-5"
-                      placeholder="Tell me more about your vision..."
+                      rows={4}
+                      className="bg-white/[0.02] border-white/10 rounded-2xl focus-visible:ring-primary/30 transition-all text-sm resize-none"
+                      placeholder="Share your vision..."
                     />
                   </div>
 
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full h-16 rounded-2xl bg-foreground text-background hover:bg-primary hover:text-white transition-all duration-500 group relative overflow-hidden"
+                    className="w-full h-14 rounded-xl bg-primary text-white hover:brightness-110 transition-all group overflow-hidden"
                   >
                     <AnimatePresence mode="wait">
                       {isSubmitting ? (
@@ -256,36 +249,32 @@ export function Contact() {
                           key="loading"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="flex items-center gap-3"
+                          className="flex items-center gap-2"
                         >
-                          <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                          <span className="font-bold uppercase tracking-widest text-xs">
-                            Transmitting...
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span className="text-xs font-bold uppercase tracking-widest">
+                            Sending...
                           </span>
                         </motion.div>
                       ) : submitStatus === "success" ? (
                         <motion.div
                           key="success"
-                          initial={{ y: 20 }}
+                          initial={{ y: 10 }}
                           animate={{ y: 0 }}
                           className="flex items-center gap-2"
                         >
-                          <CheckCircle className="w-5 h-5 text-emerald-400" />
-                          <span className="font-bold uppercase tracking-widest text-xs">
-                            Message Received!
+                          <CheckCircle className="w-4 h-4 text-white" />
+                          <span className="text-xs font-bold uppercase tracking-widest">
+                            Success!
                           </span>
                         </motion.div>
                       ) : (
-                        <motion.div
-                          key="idle"
-                          className="flex items-center gap-2"
-                        >
-                          <span className="font-bold uppercase tracking-widest text-xs">
-                            Launch Message
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold uppercase tracking-widest">
+                            Send Message
                           </span>
-                          <Send className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                        </motion.div>
+                          <Send className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        </div>
                       )}
                     </AnimatePresence>
                   </Button>
