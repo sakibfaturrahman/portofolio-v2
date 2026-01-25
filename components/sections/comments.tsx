@@ -43,7 +43,7 @@ const INITIAL_COMMENTS: Comment[] = [
         id: "1-1",
         user: "Sakib Faturrahman.",
         role: "Developer",
-        text: "Terima kasih Alex! Saya fokus di efisiensi query database-nya.",
+        text: "Terima kasih Rudi! Saya fokus di efisiensi query database-nya.",
         likes: 5,
         time: "1h ago",
         isLiked: true,
