@@ -67,12 +67,6 @@ const allSkills = [
     type: "Database",
   },
   {
-    name: "Supabase",
-    icon: "https://cdn.simpleicons.org/supabase/3ECF8E",
-    color: "#3ECF8E",
-    type: "Database",
-  },
-  {
     name: "React",
     icon: "https://cdn.simpleicons.org/react/61DAFB",
     color: "#61DAFB",
@@ -89,18 +83,6 @@ const allSkills = [
     icon: "https://cdn.simpleicons.org/tailwindcss/06B6D4",
     color: "#06B6D4",
     type: "Front-End",
-  },
-  {
-    name: "Flutter",
-    icon: "https://cdn.simpleicons.org/flutter/02569B",
-    color: "#02569B",
-    type: "Mobile",
-  },
-  {
-    name: "Dart",
-    icon: "https://cdn.simpleicons.org/dart/0175C2",
-    color: "#0175C2",
-    type: "Mobile",
   },
   {
     name: "Git",
@@ -147,8 +129,8 @@ export function Skills() {
                 </span>
               </h2>
               <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-8 max-w-md mx-auto lg:mx-0">
-                A curated selection of technologies I leverage to build robust,
-                high-performance, and scalable digital solutions.
+                Kumpulan teknologi yang saya gunakan untuk membangun solusi
+                digital yang tangguh, berkinerja tinggi, dan skalabel.
               </p>
 
               <div className="flex flex-wrap justify-center lg:justify-start gap-2">
@@ -223,7 +205,7 @@ export function Skills() {
               </AnimatePresence>
             </motion.div>
 
-            {/* View More Button */}
+            {/* View More Button (Hanya Mobile) */}
             <div className="mt-8 flex justify-center sm:hidden">
               <Button
                 variant="ghost"
@@ -256,7 +238,7 @@ export function Skills() {
                     Continuous Learning
                   </h5>
                   <p className="text-[10px] md:text-xs text-muted-foreground italic">
-                    Currently exploring:{" "}
+                    Sedang mendalami:{" "}
                     <span className="text-primary font-medium uppercase tracking-tighter">
                       AI Integration & Advanced System Architecture.
                     </span>

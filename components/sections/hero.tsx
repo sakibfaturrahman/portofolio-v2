@@ -14,7 +14,6 @@ import {
   staggerItemVariants,
 } from "@/lib/animations";
 
-// Komponen AnimatedText tetap sama
 function AnimatedText({
   text,
   className,
@@ -53,7 +52,6 @@ export function Hero() {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  // Menggunakan damping lebih tinggi agar gerakan lebih smooth & ringan
   const smoothMouseX = useSpring(mouseX, { stiffness: 70, damping: 25 });
   const smoothMouseY = useSpring(mouseY, { stiffness: 70, damping: 25 });
 
@@ -68,7 +66,6 @@ export function Hero() {
     checkMobile();
     window.addEventListener("resize", checkMobile);
 
-    // GSAP Cleanup & Context
     let ctx = gsap.context(() => {
       if (helloRef.current) {
         const text = helloRef.current.innerText;
@@ -96,11 +93,10 @@ export function Hero() {
     });
 
     const handleGlobalMouseMove = (e: MouseEvent) => {
-      if (window.innerWidth < 1024) return; // Nonaktifkan parallax di mobile
+      if (window.innerWidth < 1024) return;
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
 
-      // RequestAnimationFrame untuk efisiensi CPU
       window.requestAnimationFrame(() => {
         mouseX.set((e.clientX - rect.left) / rect.width - 0.5);
         mouseY.set((e.clientY - rect.top) / rect.height - 0.5);
@@ -134,7 +130,7 @@ export function Hero() {
     >
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-20 w-full">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Bagian Teks */}
+          {/* Text Content */}
           <motion.div
             variants={staggerContainerVariants}
             initial="hidden"
@@ -159,7 +155,7 @@ export function Hero() {
               >
                 Hello there, I&apos;m
               </span>
-              <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.9]">
+              <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.9] font-montserrat">
                 <AnimatedText text="Sakib" />
                 <br />
                 <AnimatedText text="Faturrahman" />
@@ -211,7 +207,7 @@ export function Hero() {
             </motion.div>
           </motion.div>
 
-          {/* Bagian Foto Profil */}
+          {/* Profile Image Section */}
           <motion.div className="relative flex justify-center lg:justify-end order-1 lg:order-2">
             <motion.div
               style={{
@@ -224,32 +220,39 @@ export function Hero() {
               onMouseLeave={() => setIsHovered(false)}
               onMouseMove={handleImageMouseMove}
             >
-              {/* Glow Aura */}
+              {/* Glow Aura Decor */}
               <div
                 className={`absolute -inset-10 bg-primary/10 rounded-full blur-3xl transition-opacity duration-1000 ${isHovered ? "opacity-100" : "opacity-30"}`}
               />
 
               <div className="relative w-72 h-72 md:w-96 md:h-96 lg:w-[420px] lg:h-[420px] rounded-[3rem] overflow-hidden border-[6px] border-card shadow-2xl bg-zinc-900 transition-transform duration-500 hover:rotate-0 rotate-2">
-                {/* Layer 1: Base Image */}
+                {/* Layer 1: Base Image (Saturasi Rendah/Mati di Desktop) */}
                 <Image
                   src="/images/porto.webp"
                   alt="Profile Background"
                   fill
                   priority
                   sizes="(max-width: 1024px) 384px, 420px"
-                  className={`object-cover transition-all duration-500 ${!isMobile && isHovered ? "grayscale brightness-75" : "grayscale-0"}`}
+                  className={`object-cover transition-all duration-700 ${
+                    !isMobile
+                      ? isHovered
+                        ? "grayscale brightness-50"
+                        : "grayscale opacity-60"
+                      : "grayscale-0 brightness-100"
+                  }`}
                 />
 
-                {/* Layer 2: Masked Spotlight (Hanya Desktop) */}
+                {/* Layer 2: Masked Color Spotlight (Desktop Only) */}
                 {!isMobile && (
                   <motion.div
                     className="absolute inset-0 pointer-events-none z-10"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: isHovered ? 1 : 0 }}
+                    transition={{ duration: 0.3 }}
                     style={
                       {
-                        WebkitMaskImage: `radial-gradient(circle 120px at ${spotlightPos.x}% ${spotlightPos.y}%, black 40%, transparent 100%)`,
-                        maskImage: `radial-gradient(circle 120px at ${spotlightPos.x}% ${spotlightPos.y}%, black 40%, transparent 100%)`,
+                        WebkitMaskImage: `radial-gradient(circle 130px at ${spotlightPos.x}% ${spotlightPos.y}%, black 40%, transparent 100%)`,
+                        maskImage: `radial-gradient(circle 130px at ${spotlightPos.x}% ${spotlightPos.y}%, black 40%, transparent 100%)`,
                       } as any
                     }
                   >
@@ -263,7 +266,7 @@ export function Hero() {
                 )}
               </div>
 
-              {/* Float Badge (Hanya muncul di Desktop) */}
+              {/* Float Badge (Desktop Only) */}
               <motion.div
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 4, repeat: Infinity }}

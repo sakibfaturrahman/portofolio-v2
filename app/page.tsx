@@ -1,3 +1,5 @@
+"use client";
+
 import { Navbar } from "@/components/navbar";
 import { ProgressBar } from "@/components/progress-bar";
 import { Hero } from "@/components/sections/hero";
@@ -6,6 +8,8 @@ import { Skills } from "@/components/sections/skills";
 import { Experience } from "@/components/sections/experience";
 import { Projects } from "@/components/sections/projects";
 import { Contact } from "@/components/sections/contact";
+// Import komponen comments yang baru dibuat
+import { Comments } from "@/components/sections/comments";
 import { Footer } from "@/components/footer";
 
 export default function HomePage() {
@@ -36,6 +40,9 @@ export default function HomePage() {
 
         {/* Contact - Form with validation */}
         <Contact />
+
+        {/* Public Discussion Section - Engagement feature */}
+        <Comments />
       </main>
 
       {/* Footer with back-to-top button */}
