@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp, Terminal } from "lucide-react";
+import { ChevronDown, ChevronUp, Terminal, Cpu } from "lucide-react";
 import { ScrollWrapper } from "@/components/scroll-wrapper";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   staggerContainerVariants,
   staggerItemVariants,
@@ -16,13 +15,13 @@ const allSkills = [
     name: "HTML5",
     icon: "https://cdn.simpleicons.org/html5/E34F26",
     color: "#E34F26",
-    type: "Web",
+    type: "Front-End",
   },
   {
     name: "CSS3",
     icon: "https://cdn.simpleicons.org/css/1572B6",
     color: "#1572B6",
-    type: "Web",
+    type: "Front-End",
   },
   {
     name: "JavaScript",
@@ -55,6 +54,18 @@ const allSkills = [
     type: "Back-End",
   },
   {
+    name: "Python",
+    icon: "https://cdn.simpleicons.org/python/3776AB",
+    color: "#3776AB",
+    type: "Back-End",
+  },
+  {
+    name: "PostgreSQL",
+    icon: "https://cdn.simpleicons.org/postgresql/4169E1",
+    color: "#4169E1",
+    type: "Database",
+  },
+  {
     name: "MySQL",
     icon: "https://cdn.simpleicons.org/mysql/4479A1",
     color: "#4479A1",
@@ -67,6 +78,19 @@ const allSkills = [
     type: "Database",
   },
   {
+    name: "Supabase",
+    icon: "https://cdn.simpleicons.org/supabase/3FCF8E",
+    color: "#3FCF8E",
+    type: "Tools",
+  },
+  {
+    name: "Prisma",
+    icon: "https://cdn.simpleicons.org/prisma/5A67D8",
+    color: "#5A67D8",
+    type: "Tools",
+    isInvert: true,
+  },
+  {
     name: "React",
     icon: "https://cdn.simpleicons.org/react/61DAFB",
     color: "#61DAFB",
@@ -74,9 +98,10 @@ const allSkills = [
   },
   {
     name: "Next.js",
-    icon: "https://cdn.simpleicons.org/nextdotjs/white",
+    icon: "https://cdn.simpleicons.org/nextdotjs/black",
     color: "#ffffff",
     type: "Front-End",
+    isNext: true,
   },
   {
     name: "Tailwind",
@@ -85,10 +110,23 @@ const allSkills = [
     type: "Front-End",
   },
   {
+    name: "Bootstrap",
+    icon: "https://cdn.simpleicons.org/bootstrap/7952B3",
+    color: "#7952B3",
+    type: "Front-End",
+  },
+  {
     name: "Git",
     icon: "https://cdn.simpleicons.org/git/F05032",
     color: "#F05032",
     type: "Tools",
+  },
+  {
+    name: "GitHub",
+    icon: "https://cdn.simpleicons.org/github/181717",
+    color: "#181717",
+    type: "Tools",
+    isGithub: true,
   },
   {
     name: "Postman",
@@ -105,141 +143,162 @@ const allSkills = [
   },
 ];
 
+const categories = ["All", "Back-End", "Front-End", "Database", "Tools"];
+
 export function Skills() {
+  const [activeCategory, setActiveCategory] = useState("All");
   const [isExpanded, setIsExpanded] = useState(false);
   const mobileLimit = 6;
+
+  const filteredSkills = useMemo(() => {
+    if (activeCategory === "All") return allSkills;
+    return allSkills.filter((skill) => skill.type === activeCategory);
+  }, [activeCategory]);
 
   return (
     <section
       id="skills"
-      className="py-16 md:py-24 relative overflow-hidden bg-zinc-950/20"
+      className="py-20 md:py-32 relative overflow-hidden bg-white dark:bg-black transition-colors duration-500"
     >
-      <div className="absolute top-0 right-0 -translate-y-1/2 w-72 md:w-96 h-72 md:h-96 bg-primary/5 rounded-full blur-[80px] md:blur-[120px] pointer-events-none" />
+      {/* Background Decor - Opacity dikurangi agar tetap clean */}
+      <div className="absolute top-0 right-0 -translate-y-1/2 w-72 md:w-96 h-72 md:h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none opacity-50 dark:opacity-20" />
 
       <div className="relative max-w-6xl mx-auto px-6">
-        <div className="grid lg:grid-cols-3 gap-10 lg:gap-12 items-start">
+        <div className="grid lg:grid-cols-3 gap-12 items-start">
           {/* Left Column */}
-          <div className="lg:col-span-1 lg:sticky lg:top-32 text-center lg:text-left">
+          <div className="lg:col-span-1 lg:sticky lg:top-32">
             <ScrollWrapper>
-              <h2 className="text-3xl md:text-5xl font-black text-foreground font-montserrat tracking-tighter mb-6">
-                Tools & <br className="hidden lg:block" />
-                <span className="text-primary">Tech</span>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">
-                  stack.
-                </span>
-              </h2>
-              <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-8 max-w-md mx-auto lg:mx-0">
-                Kumpulan teknologi yang saya gunakan untuk membangun solusi
-                digital yang tangguh, berkinerja tinggi, dan skalabel.
-              </p>
+              <div className="text-center lg:text-left space-y-6">
+                <div className="space-y-2">
+                  <h2 className="text-4xl md:text-5xl font-black text-zinc-900 dark:text-white font-montserrat tracking-tighter leading-none">
+                    Tools & <br className="hidden lg:block" />
+                    <span className="bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
+                      Techstack.
+                    </span>
+                  </h2>
+                </div>
+                <p className="text-sm md:text-base text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-md mx-auto lg:mx-0">
+                  A collection of technologies I use to build robust,
+                  high-performance, and scalable digital solutions.
+                </p>
 
-              <div className="flex flex-wrap justify-center lg:justify-start gap-2">
-                {["Back-End", "Front-End", "Database"].map((cat) => (
-                  <Badge
-                    key={cat}
-                    variant="outline"
-                    className="text-[10px] uppercase font-mono border-primary/20 text-primary/70"
-                  >
-                    {cat}
-                  </Badge>
-                ))}
+                {/* Category Buttons */}
+                <div className="flex flex-wrap justify-center lg:justify-start gap-2 pt-4">
+                  {categories.map((cat) => (
+                    <Button
+                      key={cat}
+                      variant={activeCategory === cat ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        setActiveCategory(cat);
+                        setIsExpanded(false);
+                      }}
+                      className={`text-[10px] uppercase font-bold h-9 px-5 rounded-full transition-all duration-300 ${
+                        activeCategory === cat
+                          ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
+                          : "bg-transparent border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-primary/50"
+                      }`}
+                    >
+                      {cat}
+                    </Button>
+                  ))}
+                </div>
               </div>
             </ScrollWrapper>
           </div>
 
-          {/* Right Column */}
+          {/* Right Column: Skills Grid */}
           <div className="lg:col-span-2">
             <motion.div
+              layout
               variants={staggerContainerVariants}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: false, amount: 0.1 }}
-              className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4 overflow-hidden"
+              viewport={{ once: true }}
+              className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"
             >
-              <AnimatePresence>
-                {allSkills.map((skill, index) => {
+              <AnimatePresence mode="popLayout">
+                {filteredSkills.map((skill, index) => {
                   const isHiddenOnMobile = !isExpanded && index >= mobileLimit;
-                  const IconComponent = skill.icon;
 
                   return (
                     <motion.div
                       key={skill.name}
+                      layout
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
                       variants={staggerItemVariants}
-                      whileHover={{ y: -5 }}
-                      className={`relative group ${
-                        isHiddenOnMobile ? "hidden sm:block" : "block"
-                      }`}
+                      className={`${isHiddenOnMobile ? "hidden sm:block" : "block"}`}
                     >
-                      <div className="bg-card/40 backdrop-blur-sm border border-border/50 p-3.5 rounded-2xl flex items-center gap-4 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300">
+                      <div className="group relative bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800/50 p-4 rounded-2xl flex items-center gap-4 hover:bg-white dark:hover:bg-zinc-900 hover:border-primary/30 transition-all duration-500">
                         {/* Icon Wrapper */}
-                        <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-background/50 border border-border/20 group-hover:scale-110 transition-transform duration-300 overflow-hidden">
+                        <div className="w-11 h-11 flex items-center justify-center rounded-xl bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 group-hover:border-primary/20 group-hover:scale-110 transition-all duration-500 shadow-sm">
                           {skill.isLucide ? (
-                            <IconComponent className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                            <skill.icon className="w-5 h-5 text-zinc-500 dark:text-zinc-400 group-hover:text-primary" />
                           ) : (
                             <img
                               src={skill.icon as string}
                               alt={skill.name}
-                              className="w-6 h-6 object-contain transition-all duration-500 filter grayscale group-hover:grayscale-0"
+                              className={`w-6 h-6 object-contain filter grayscale group-hover:grayscale-0 transition-all duration-500 ${
+                                skill.isNext || skill.isGithub || skill.isInvert
+                                  ? "dark:invert"
+                                  : ""
+                              }`}
                             />
                           )}
                         </div>
 
-                        <div className="flex flex-col justify-center">
-                          <h4 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors leading-none mb-1.5">
+                        <div className="flex flex-col">
+                          <h4 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 group-hover:text-primary transition-colors">
                             {skill.name}
                           </h4>
-                          <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
+                          <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-tighter">
                             {skill.type}
-                          </p>
+                          </span>
                         </div>
                       </div>
-
-                      {/* Glow effect on hover */}
-                      <div
-                        className="absolute inset-0 -z-10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity blur-xl"
-                        style={{ backgroundColor: `${skill.color}20` }}
-                      />
                     </motion.div>
                   );
                 })}
               </AnimatePresence>
             </motion.div>
 
-            {/* View More Button (Hanya Mobile) */}
-            <div className="mt-8 flex justify-center sm:hidden">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="text-primary font-mono text-xs hover:bg-primary/10 group"
-              >
-                {isExpanded ? (
-                  <>
-                    Show Less{" "}
-                    <ChevronUp className="ml-2 w-4 h-4 group-hover:-translate-y-1 transition-transform" />
-                  </>
-                ) : (
-                  <>
-                    View All Skills{" "}
-                    <ChevronDown className="ml-2 w-4 h-4 group-hover:translate-y-1 transition-transform" />
-                  </>
-                )}
-              </Button>
-            </div>
+            {/* View More Button */}
+            {filteredSkills.length > mobileLimit && (
+              <div className="mt-8 flex justify-center sm:hidden">
+                <Button
+                  variant="ghost"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="text-primary font-bold text-xs gap-2"
+                >
+                  {isExpanded ? (
+                    <>
+                      Show Less <ChevronUp className="w-4 h-4" />
+                    </>
+                  ) : (
+                    <>
+                      View All {activeCategory}{" "}
+                      <ChevronDown className="w-4 h-4" />
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
 
-            {/* Learning Note */}
+            {/* Note Card */}
             <ScrollWrapper className="mt-12">
-              <div className="p-5 md:p-6 rounded-3xl bg-gradient-to-br from-primary/5 to-transparent border border-primary/10 flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/20 flex items-center justify-center animate-pulse shrink-0">
-                  <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-primary" />
+              <div className="p-6 rounded-[2rem] bg-zinc-50 dark:bg-zinc-900/30 border border-zinc-100 dark:border-zinc-800/50 flex items-center gap-6">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <Cpu className="w-6 h-6 text-primary animate-pulse" />
                 </div>
-                <div className="text-center sm:text-left">
-                  <h5 className="text-xs md:text-sm font-bold mb-1 uppercase tracking-wider font-montserrat text-foreground">
+                <div>
+                  <h5 className="text-xs font-bold uppercase tracking-widest text-zinc-800 dark:text-white mb-1">
                     Continuous Learning
                   </h5>
-                  <p className="text-[10px] md:text-xs text-muted-foreground italic">
-                    Sedang mendalami:{" "}
-                    <span className="text-primary font-medium uppercase tracking-tighter">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed italic">
+                    Currently exploring:{" "}
+                    <span className="text-primary font-semibold">
                       AI Integration & Advanced System Architecture.
                     </span>
                   </p>

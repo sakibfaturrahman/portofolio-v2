@@ -90,7 +90,7 @@ export function Navbar() {
             {/* Controls */}
             <div className="flex items-center gap-1 md:gap-2 shrink-0">
               {/* Language */}
-              <Button
+              {/* <Button
                 variant="ghost"
                 size="sm"
                 onClick={toggleLanguage}
@@ -100,7 +100,7 @@ export function Navbar() {
                 <span className="text-[10px] font-black font-mono leading-none">
                   {language}
                 </span>
-              </Button>
+              </Button> */}
 
               {/* Theme Toggle */}
               {mounted && (

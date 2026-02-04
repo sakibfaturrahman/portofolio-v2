@@ -2,16 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  MessageSquare,
-  Heart,
-  Reply,
-  Send,
-  User,
-  ShieldCheck,
-  ArrowDown,
-  Hash,
-} from "lucide-react";
+import { Heart, Reply, Send, ShieldCheck, Hash, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -72,7 +63,6 @@ export function Comments() {
   } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Auto scroll ke bawah saat ada pesan baru
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -129,7 +119,7 @@ export function Comments() {
       );
       setReplyTarget(null);
     } else {
-      setComments((prev) => [...prev, addedComment]); // Menambah ke bawah agar seperti chat
+      setComments((prev) => [...prev, addedComment]);
     }
     setNewComment("");
   };
@@ -137,28 +127,28 @@ export function Comments() {
   return (
     <section
       id="comments"
-      className="py-20 px-6 bg-background transition-colors duration-300"
+      className="py-20 px-6 bg-white dark:bg-black transition-colors duration-500"
     >
       <div className="max-w-5xl mx-auto">
-        <Card className="border-border bg-card/50 backdrop-blur-xl rounded-4xl overflow-hidden shadow-2xl flex flex-col h-[650px] md:h-[750px]">
+        <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded-[2.5rem] overflow-hidden shadow-xl flex flex-col h-[650px] md:h-[750px]">
           {/* Header */}
-          <CardHeader className="border-b border-border bg-muted/30 py-4 flex flex-row items-center justify-between">
+          <CardHeader className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/20 py-5 flex flex-row items-center justify-between px-8">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10">
+              <div className="p-2 rounded-xl bg-primary/10 border border-primary/20">
                 <Hash className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-lg font-bold font-montserrat">
+                <CardTitle className="text-lg font-black font-montserrat tracking-tight text-zinc-900 dark:text-zinc-100">
                   public-discussion
                 </CardTitle>
-                <p className="text-xs text-muted-foreground hidden sm:block">
-                  General discussion about development & projects
+                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest hidden sm:block">
+                  Development & System Architecture
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20">
+              <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-[10px] font-bold text-green-600 dark:text-green-400 uppercase tracking-tighter">
                 Live
               </span>
             </div>
@@ -167,7 +157,7 @@ export function Comments() {
           {/* Chat Area */}
           <CardContent
             ref={scrollRef}
-            className="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 scrollbar-thin scrollbar-thumb-primary/10"
+            className="flex-1 overflow-y-auto p-6 md:p-10 space-y-8 scrollbar-hide"
           >
             <AnimatePresence>
               {comments.map((comment) => (
@@ -179,7 +169,7 @@ export function Comments() {
                   />
 
                   {comment.replies.length > 0 && (
-                    <div className="ml-6 md:ml-12 pl-4 border-l-2 border-primary/10 space-y-6">
+                    <div className="ml-6 md:ml-14 pl-6 border-l border-zinc-200 dark:border-zinc-800 space-y-6">
                       {comment.replies.map((reply) => (
                         <CommentItem
                           key={reply.id}
@@ -199,46 +189,55 @@ export function Comments() {
           </CardContent>
 
           {/* Footer Input */}
-          <div className="p-4 bg-muted/30 border-t border-border">
-            <form onSubmit={handleSubmit} className="relative group">
-              {replyTarget && (
-                <div className="absolute bottom-full left-0 right-0 mb-2 p-2 bg-primary/10 border border-primary/20 rounded-t-lg flex justify-between items-center animate-in slide-in-from-bottom-2">
-                  <span className="text-[10px] font-bold text-primary px-2 uppercase">
-                    Replying to @{replyTarget.name}
-                  </span>
-                  <button
-                    onClick={() => setReplyTarget(null)}
-                    className="text-primary hover:scale-110 transition-transform px-2 text-xs font-black"
+          <div className="p-6 bg-zinc-50/50 dark:bg-zinc-900/20 border-t border-zinc-100 dark:border-zinc-800">
+            <form onSubmit={handleSubmit} className="relative">
+              <AnimatePresence>
+                {replyTarget && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute bottom-full left-0 right-0 mb-3 p-3 bg-primary/10 border border-primary/20 rounded-2xl flex justify-between items-center backdrop-blur-md"
                   >
-                    ×
-                  </button>
-                </div>
-              )}
+                    <span className="text-[10px] font-bold text-primary px-2 uppercase tracking-widest">
+                      Replying to{" "}
+                      <span className="underline">@{replyTarget.name}</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setReplyTarget(null)}
+                      className="bg-primary/20 hover:bg-primary/30 text-primary p-1 rounded-full transition-colors"
+                    >
+                      <X size={14} />
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               <div
-                className={`relative flex items-center gap-2 bg-background border ${replyTarget ? "rounded-b-lg rounded-t-none" : "rounded-lg"} border-border px-3 py-2 focus-within:ring-2 ring-primary/20 transition-all`}
+                className={`flex items-center gap-3 bg-white dark:bg-black border ${replyTarget ? "rounded-2xl" : "rounded-2xl"} border-zinc-200 dark:border-zinc-800 p-2 pl-5 focus-within:border-primary transition-all shadow-sm`}
               >
                 <Input
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Type your message..."
-                  className="bg-transparent border-none focus-visible:ring-0 text-sm placeholder:text-muted-foreground/50"
+                  placeholder="Share your thoughts..."
+                  className="bg-transparent border-none focus-visible:ring-0 text-sm placeholder:text-zinc-400 dark:text-zinc-200 p-0"
                 />
                 <Button
                   type="submit"
-                  size="sm"
-                  className="rounded-md h-9 px-4 shrink-0"
+                  disabled={!newComment.trim()}
+                  className="rounded-xl h-10 px-5 bg-primary hover:bg-primary/90 text-white font-bold transition-all shrink-0 shadow-lg shadow-primary/20"
                 >
-                  <Send className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Send</span>
+                  <Send className="w-4 h-4 md:mr-2" />
+                  <span className="hidden md:inline">Send Message</span>
                 </Button>
               </div>
             </form>
           </div>
         </Card>
 
-        <p className="mt-4 text-center text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
-          End of public transmission
+        <p className="mt-6 text-center text-[10px] text-zinc-400 dark:text-zinc-600 font-bold uppercase tracking-[0.3em]">
+          End of encrypted transmission
         </p>
       </div>
     </section>
@@ -258,44 +257,49 @@ function CommentItem({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
-      className="group flex gap-3 md:gap-4"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="group flex gap-4 md:gap-5"
     >
       <Avatar
-        className={`${isReply ? "h-8 w-8" : "h-10 w-10"} rounded-lg border border-border shadow-sm`}
+        className={`${isReply ? "h-9 w-9" : "h-11 w-11"} rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm`}
       >
-        <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold">
+        <AvatarFallback className="bg-zinc-100 dark:bg-zinc-900 text-primary text-xs font-black">
           {comment.user.charAt(0)}
         </AvatarFallback>
       </Avatar>
 
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1 flex-wrap">
-          <span className="text-sm font-black text-foreground">
+        <div className="flex items-center gap-2 mb-1.5">
+          <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
             {comment.user}
           </span>
           {comment.role === "Developer" && (
-            <ShieldCheck className="w-3.5 h-3.5 text-primary" />
+            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-primary/10 border border-primary/20">
+              <ShieldCheck className="w-3 h-3 text-primary" />
+              <span className="text-[8px] font-black text-primary uppercase">
+                Staff
+              </span>
+            </div>
           )}
-          <span className="text-[9px] font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded uppercase tracking-tighter">
-            {comment.time}
+          <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-600 uppercase tracking-tighter">
+            • {comment.time}
           </span>
         </div>
 
         <div
-          className={`p-3 md:p-4 rounded-xl rounded-tl-none border border-border ${isReply ? "bg-muted/20" : "bg-muted/40"} text-sm text-foreground/80 leading-relaxed shadow-sm`}
+          className={`p-4 rounded-2xl rounded-tl-none border border-zinc-100 dark:border-zinc-800 ${isReply ? "bg-zinc-50/50 dark:bg-zinc-900/30" : "bg-zinc-50 dark:bg-zinc-900/50"} text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed shadow-sm group-hover:border-primary/20 transition-colors`}
         >
           {comment.text}
         </div>
 
-        <div className="flex items-center gap-4 mt-2 ml-1">
+        <div className="flex items-center gap-5 mt-2.5 ml-1">
           <button
             onClick={() => onLike(comment.id)}
-            className={`flex items-center gap-1.5 text-[11px] font-bold transition-all ${comment.isLiked ? "text-red-500" : "text-muted-foreground hover:text-foreground"}`}
+            className={`flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest transition-all ${comment.isLiked ? "text-red-500" : "text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"}`}
           >
             <Heart
-              size={14}
+              size={13}
               fill={comment.isLiked ? "currentColor" : "none"}
               className={comment.isLiked ? "animate-bounce" : ""}
             />
@@ -303,9 +307,9 @@ function CommentItem({
           </button>
           <button
             onClick={() => onReply(comment.id, comment.user)}
-            className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground hover:text-primary transition-all"
+            className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-primary transition-all"
           >
-            <Reply size={14} />
+            <Reply size={13} />
             Reply
           </button>
         </div>

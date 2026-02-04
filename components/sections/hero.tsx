@@ -6,6 +6,7 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import gsap from "gsap";
+import ShinyText from "@/components/ShinyText";
 import {
   textRevealContainerVariants,
   textRevealCharVariants,
@@ -126,7 +127,7 @@ export function Hero() {
     <section
       id="hero"
       ref={containerRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 bg-white dark:bg-black transition-colors duration-500"
     >
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-20 w-full">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -142,20 +143,25 @@ export function Hero() {
               className="mb-8 items-center lg:items-start flex flex-col"
             >
               <div className="bg-card/40 backdrop-blur-md border border-border/50 px-4 py-2 rounded-2xl">
-                <p className="text-sm italic text-muted-foreground">
-                  "developing future"
-                </p>
+                <ShinyText
+                  text="developing future"
+                  speed={2}
+                  className="text-sm italic font-medium"
+                  color="#71717a"
+                  shineColor="#ffffff"
+                  spread={120}
+                />
               </div>
             </motion.div>
 
             <div className="mb-8">
               <span
                 ref={helloRef}
-                className="text-lg font-medium text-muted-foreground block mb-3"
+                className="text-lg font-medium text-zinc-500 dark:text-zinc-400 block mb-3"
               >
                 Hello there, I&apos;m
               </span>
-              <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.9] font-montserrat">
+              <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.9] font-montserrat text-black dark:text-white">
                 <AnimatedText text="Sakib" />
                 <br />
                 <AnimatedText text="Faturrahman" />
@@ -164,7 +170,7 @@ export function Hero() {
 
             <motion.p
               variants={fadeUpVariants}
-              className="text-lg text-muted-foreground mb-10 max-w-md mx-auto lg:mx-0"
+              className="text-lg text-zinc-500 dark:text-zinc-400 mb-10 max-w-md mx-auto lg:mx-0"
             >
               Back-End Focused Developer. Building{" "}
               <span className="text-primary font-semibold">
@@ -190,7 +196,7 @@ export function Hero() {
                 asChild
                 variant="outline"
                 size="lg"
-                className="rounded-xl"
+                className="rounded-xl border-zinc-200 dark:border-zinc-800 text-black dark:text-white"
               >
                 <a
                   href="#contact"
@@ -225,8 +231,7 @@ export function Hero() {
                 className={`absolute -inset-10 bg-primary/10 rounded-full blur-3xl transition-opacity duration-1000 ${isHovered ? "opacity-100" : "opacity-30"}`}
               />
 
-              <div className="relative w-72 h-72 md:w-96 md:h-96 lg:w-[420px] lg:h-[420px] rounded-[3rem] overflow-hidden border-[6px] border-card shadow-2xl bg-zinc-900 transition-transform duration-500 hover:rotate-0 rotate-2">
-                {/* Layer 1: Base Image (Saturasi Rendah/Mati di Desktop) */}
+              <div className="relative w-72 h-72 md:w-96 md:h-96 lg:w-[420px] lg:h-[420px] rounded-[3rem] overflow-hidden border-[6px] border-zinc-100 dark:border-zinc-900 shadow-2xl bg-zinc-900 transition-transform duration-500 hover:rotate-0 rotate-2">
                 <Image
                   src="/images/porto.webp"
                   alt="Profile Background"
@@ -242,7 +247,6 @@ export function Hero() {
                   }`}
                 />
 
-                {/* Layer 2: Masked Color Spotlight (Desktop Only) */}
                 {!isMobile && (
                   <motion.div
                     className="absolute inset-0 pointer-events-none z-10"
@@ -266,13 +270,13 @@ export function Hero() {
                 )}
               </div>
 
-              {/* Float Badge (Desktop Only) */}
+              {/* Float Badge */}
               <motion.div
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 4, repeat: Infinity }}
-                className="hidden lg:flex absolute -left-6 top-1/4 px-5 py-2.5 bg-card/90 backdrop-blur-md border border-border rounded-2xl shadow-xl z-30"
+                className="hidden lg:flex absolute -left-6 top-1/4 px-5 py-2.5 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl z-30"
               >
-                <span className="text-sm font-bold flex items-center gap-2">
+                <span className="text-sm font-bold flex items-center gap-2 text-black dark:text-white">
                   <div
                     className={`w-2 h-2 rounded-full ${isHovered ? "bg-green-500 animate-pulse" : "bg-zinc-500"}`}
                   />

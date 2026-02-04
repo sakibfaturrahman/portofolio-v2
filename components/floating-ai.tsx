@@ -23,6 +23,16 @@ type Message = {
   timestamp: Date;
 };
 
+// Daftar teks ajakan yang akan muncul secara acak
+const invitationTexts = [
+  "Penasaran sama Sakib? Tanya AI aja! ✨",
+  "Cari tahu pengalaman Sakib lebih cepat di sini. 🚀",
+  "Ngobrol santai bareng asisten virtual Sakib, yuk! 👋",
+  "NexaOrion siap bantu jawab pertanyaanmu. 🛠️",
+  "Buka database pengetahuan Sakib di sini. 🧠",
+  "Ada yang mau ditanyakan tentang Sakib? 💬",
+];
+
 export default function FloatingAI() {
   const [isOpen, setIsOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
@@ -30,30 +40,40 @@ export default function FloatingAI() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [currentTooltipText, setCurrentTooltipText] = useState(
+    invitationTexts[0],
+  );
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Fungsi Render Link
-  const renderTextWithLinks = (text: string) => {
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    return text.split(urlRegex).map((part, index) => {
-      if (part.match(urlRegex)) {
-        return (
-          <a
-            key={index}
-            href={part}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-400 underline hover:text-blue-300 font-bold break-all"
-          >
-            {part}
-          </a>
-        );
-      }
-      return part;
-    });
-  };
+  // --- Logic Tooltip Berubah-ubah (7s Tampil, 3s Hilang) ---
+  useEffect(() => {
+    if (isOpen) {
+      setShowTooltip(false);
+      return;
+    }
 
-  // Auto Scroll - Diperkuat agar selalu ke bawah saat loading/pesan bertambah
+    let timeoutId: NodeJS.Timeout;
+
+    const intervalId = setInterval(() => {
+      // Pilih teks acak
+      const randomIndex = Math.floor(Math.random() * invitationTexts.length);
+      setCurrentTooltipText(invitationTexts[randomIndex]);
+
+      setShowTooltip(true);
+
+      timeoutId = setTimeout(() => {
+        setShowTooltip(false);
+      }, 7000);
+    }, 10000);
+
+    return () => {
+      clearInterval(intervalId);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [isOpen]);
+
+  // Auto Scroll
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({
@@ -63,6 +83,7 @@ export default function FloatingAI() {
     }
   }, [messages, isLoading]);
 
+  // Scroll Listener
   useEffect(() => {
     const handleScroll = () => setShowScrollTop(window.scrollY > 400);
     window.addEventListener("scroll", handleScroll);
@@ -71,8 +92,8 @@ export default function FloatingAI() {
 
   const getAIResponse = async (userInput: string, intent?: string) => {
     setIsLoading(true);
-    if (isOnline) {
-      try {
+    try {
+      if (isOnline) {
         const res = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -80,16 +101,14 @@ export default function FloatingAI() {
         });
         const data = await res.json();
         return data.text || "Waduh, koneksi ke Gemini terputus nih! 📡";
-      } catch (error) {
-        return "Ouch! Ada kabel virtual yang sedikit korslet nih! ⚡ Coba lagi nanti ya.";
-      } finally {
-        setIsLoading(false);
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, 600));
+        return buildResponse(intent || "unknown");
       }
-    } else {
-      // MODE OFFLINE - Delay sedikit agar terasa natural
-      await new Promise((resolve) => setTimeout(resolve, 600));
+    } catch (error) {
+      return "Ouch! Ada kabel virtual yang sedikit korslet nih! ⚡";
+    } finally {
       setIsLoading(false);
-      return buildResponse(intent || "unknown");
     }
   };
 
@@ -100,7 +119,6 @@ export default function FloatingAI() {
       timestamp: new Date(),
     };
     setMessages((prev) => [...prev, userMsg]);
-
     const responseText = await getAIResponse(label, intent);
     const aiMsg: Message = {
       role: "ai",
@@ -111,7 +129,7 @@ export default function FloatingAI() {
   };
 
   const handleSendMessage = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || isLoading) return;
     const userMsg: Message = {
       role: "user",
       text: input,
@@ -120,7 +138,6 @@ export default function FloatingAI() {
     setMessages((prev) => [...prev, userMsg]);
     const currentInput = input;
     setInput("");
-
     const responseText = await getAIResponse(currentInput);
     const aiMsg: Message = {
       role: "ai",
@@ -142,8 +159,33 @@ export default function FloatingAI() {
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="w-10 h-10 flex items-center justify-center rounded-2xl bg-white dark:bg-zinc-800 border shadow-xl"
           >
-            <ChevronUp size={20} />
+            <ChevronUp size={20} className="text-zinc-500" />
           </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Tooltip AI dengan Teks Dinamis */}
+      <AnimatePresence>
+        {showTooltip && !isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.9 }}
+            className="relative mr-2"
+          >
+            <div className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 px-4 py-2.5 rounded-2xl rounded-br-none shadow-2xl flex items-center gap-2 border border-white/10 dark:border-zinc-200">
+              <Sparkles size={14} className="text-primary" />
+              <p className="text-[11px] font-bold">{currentTooltipText}</p>
+              <button
+                onClick={() => setShowTooltip(false)}
+                className="ml-1 opacity-50 hover:opacity-100 transition-opacity"
+              >
+                <X size={12} />
+              </button>
+            </div>
+            {/* Arrow/Ekor Tooltip */}
+            <div className="absolute -bottom-1 right-0 w-3 h-3 bg-zinc-900 dark:bg-zinc-100 rotate-45" />
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -154,57 +196,53 @@ export default function FloatingAI() {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="w-[360px] h-[550px] flex flex-col bg-white dark:bg-zinc-900 border shadow-2xl rounded-[2.5rem] overflow-hidden"
+            className="w-[340px] md:w-[360px] h-[500px] md:h-[550px] flex flex-col bg-white dark:bg-zinc-900 border shadow-2xl rounded-[2.5rem] overflow-hidden"
           >
-            {/* Header */}
-            <div className="p-4 flex items-center justify-between border-b bg-zinc-50 dark:bg-zinc-800/50 backdrop-blur-md">
+            {/* Header Area */}
+            <div className="p-4 flex items-center justify-between border-b bg-zinc-50/50 dark:bg-zinc-800/50 backdrop-blur-md">
               <div className="flex items-center gap-2">
                 <Orbit
                   className={`text-primary ${isOnline ? "animate-spin" : ""}`}
                   size={20}
                 />
-                <div>
-                  <p className="text-sm font-bold">NexaOrion</p>
-                  <div className="flex items-center gap-1.5">
-                    <div
-                      className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-emerald-500 animate-pulse" : "bg-zinc-400"}`}
-                    />
-                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">
-                      {isOnline ? "Online Core" : "Offline Storage"}
-                    </p>
-                  </div>
+                <div className="leading-none">
+                  <p className="text-sm font-bold text-zinc-900 dark:text-white">
+                    NexaOrion
+                  </p>
+                  <p className="text-[9px] font-bold text-zinc-500 uppercase">
+                    {isOnline ? "Online Core" : "Offline Core"}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setIsOnline(!isOnline)}
-                  className={`p-2 rounded-xl transition-all ${isOnline ? "bg-emerald-500/10 text-emerald-600 shadow-inner" : "bg-zinc-100 dark:bg-zinc-700 text-zinc-500"}`}
+                  className={`p-2 rounded-xl transition-all ${isOnline ? "bg-emerald-500/10 text-emerald-600 shadow-inner" : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500"}`}
                 >
                   {isOnline ? <Wifi size={16} /> : <WifiOff size={16} />}
                 </button>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-xl transition-colors"
+                  className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors"
                 >
                   <X size={18} />
                 </button>
               </div>
             </div>
 
-            {/* Messages Area */}
+            {/* Messages Container */}
             <div
               ref={scrollRef}
-              className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth overscroll-contain"
-              style={{ scrollbarWidth: "thin" }}
+              className="flex-1 overflow-y-auto p-4 space-y-4"
             >
               <div className="flex gap-2">
                 <div className="p-2 h-fit rounded-lg bg-primary/10">
                   <Cpu size={14} className="text-primary" />
                 </div>
-                <div className="bg-zinc-100 dark:bg-zinc-800 p-3 rounded-2xl rounded-tl-none text-xs leading-relaxed">
+                <div className="bg-zinc-100 dark:bg-zinc-800 p-3 rounded-2xl rounded-tl-none text-xs text-zinc-800 dark:text-zinc-200">
                   Unit NexaOrion aktif! Mode:{" "}
-                  <b>{isOnline ? "Gemini Online" : "Offline Core"}</b>. Ada yang
-                  bisa saya bantu untuk mengenal Sakib lebih dalam? 🚀
+                  <b>{isOnline ? "Online" : "Offline"}</b>. Ada yang bisa saya
+                  bantu untuk mengenal Sakib lebih dalam? 🚀
                 </div>
               </div>
 
@@ -213,84 +251,56 @@ export default function FloatingAI() {
                   key={i}
                   className={`flex gap-2 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
                 >
-                  {/* Avatar */}
                   <div
-                    className={`p-2 rounded-lg h-fit ${
-                      msg.role === "user"
-                        ? "bg-zinc-200 dark:bg-zinc-700"
-                        : "bg-primary/10"
-                    }`}
+                    className={`p-2 rounded-lg h-fit ${msg.role === "user" ? "bg-zinc-200 dark:bg-zinc-700" : "bg-primary/10"}`}
                   >
                     {msg.role === "user" ? (
                       <User
                         size={14}
-                        className="text-zinc-600 dark:text-zinc-300"
+                        className="text-zinc-600 dark:text-zinc-400"
                       />
                     ) : (
                       <Sparkles size={14} className="text-primary" />
                     )}
                   </div>
-
-                  {/* Bubble */}
                   <div
-                    className={`max-w-[78%] p-3 rounded-2xl text-xs whitespace-pre-line shadow-sm leading-relaxed transition-colors duration-200 ${
+                    className={`max-w-[80%] p-3 rounded-2xl text-xs ${
                       msg.role === "user"
-                        ? `
-                        /* Mode Light: Bubble Hitam, Teks Putih */
-                        bg-zinc-900 text-zinc-50 
-                        
-                        /* Mode Dark: Bubble Putih, Teks Hitam */
-                        dark:bg-zinc-100 dark:text-zinc-950 
-                        
-                        rounded-tr-none
-                        font-medium
-                      `
-                        : `
-                        bg-zinc-100
-                        dark:bg-zinc-800
-                        text-zinc-800
-                        dark:text-zinc-200
-                        rounded-tl-none
-                      `
+                        ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 rounded-tr-none"
+                        : "bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-tl-none shadow-sm"
                     }`}
                   >
-                    {renderTextWithLinks(msg.text)}
+                    {msg.text}
                   </div>
                 </div>
               ))}
 
               {isLoading && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex items-center gap-2 text-zinc-400 text-[10px] font-mono italic px-6"
-                >
+                <div className="flex items-center gap-2 text-[10px] text-zinc-400 italic px-6">
                   <Loader2 size={12} className="animate-spin" />{" "}
                   NEXA_PROCESSING...
-                </motion.div>
+                </div>
               )}
             </div>
 
-            {/* Footer Control */}
-            <div className="p-4 border-t space-y-3 bg-zinc-50/50 dark:bg-zinc-900/50 backdrop-blur-md">
+            {/* Footer Control Area */}
+            <div className="p-4 border-t bg-zinc-50/30 dark:bg-zinc-900/30 backdrop-blur-md space-y-3">
               <div className="flex flex-wrap gap-2">
                 {[
-                  { label: "👋 Tentang", intent: "profile" },
-                  { label: "🛠️ Stack", intent: "skills" },
-                  { label: "📂 Projects", intent: "projects" },
-                  { label: "🎓 Edu", intent: "education" },
-                  { label: "📞 Kontak", intent: "contact" },
-                ].map((c) => (
+                  { l: "👋 Tentang", i: "profile" },
+                  { l: "🛠️ Stack", i: "skills" },
+                  { l: "📂 Projects", i: "projects" },
+                  { l: "📞 Kontak", i: "contact" },
+                ].map((btn) => (
                   <button
-                    key={c.intent}
-                    onClick={() => handleAction(c.intent, c.label)}
-                    className="text-[10px] px-3 py-1.5 rounded-xl border bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 hover:border-primary dark:hover:border-primary transition-all active:scale-95 shadow-sm font-medium"
+                    key={btn.i}
+                    onClick={() => handleAction(btn.i, btn.l)}
+                    className="text-[10px] px-3 py-1.5 rounded-xl border bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 hover:border-primary dark:hover:border-primary transition-all active:scale-95 shadow-sm font-medium text-zinc-700 dark:text-zinc-300"
                   >
-                    {c.label}
+                    {btn.l}
                   </button>
                 ))}
               </div>
-
               <div className="flex gap-2">
                 <input
                   value={input}
@@ -299,15 +309,15 @@ export default function FloatingAI() {
                   placeholder={
                     isOnline
                       ? "Tanya apa saja ke Gemini..."
-                      : "Gunakan tombol di atas (Offline)..."
+                      : "Mode Offline aktif..."
                   }
                   disabled={!isOnline}
-                  className="flex-1 px-4 py-2.5 text-xs rounded-xl border border-zinc-200 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary dark:bg-zinc-800 disabled:bg-zinc-100 dark:disabled:bg-zinc-900/50 disabled:cursor-not-allowed transition-all"
+                  className="flex-1 px-4 py-2.5 text-xs rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-primary/20 outline-none focus:border-primary transition-all disabled:opacity-50"
                 />
                 <button
                   onClick={handleSendMessage}
-                  disabled={!isOnline || !input.trim()}
-                  className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center hover:bg-primary/90 disabled:opacity-50 disabled:bg-zinc-400 transition-all shadow-lg shadow-primary/20"
+                  disabled={!isOnline || !input.trim() || isLoading}
+                  className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center hover:opacity-90 disabled:bg-zinc-400 shadow-lg shadow-primary/20 transition-all"
                 >
                   <Send size={16} />
                 </button>
@@ -317,12 +327,12 @@ export default function FloatingAI() {
         )}
       </AnimatePresence>
 
-      {/* Launcher Button */}
+      {/* Main Launcher Button */}
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 rounded-2xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center shadow-2xl border border-white/10 dark:border-zinc-200 group"
+        className="w-14 h-14 rounded-2xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center shadow-2xl border border-white/10 dark:border-zinc-200 group relative"
       >
         <Orbit
           size={28}

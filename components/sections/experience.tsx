@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Briefcase, GraduationCap, Calendar, ExternalLink } from "lucide-react";
+import { Briefcase, GraduationCap, Calendar } from "lucide-react";
 import { ScrollWrapper } from "@/components/scroll-wrapper";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -75,11 +75,14 @@ function TimelineCard({ item, index }: { item: TimelineItem; index: number }) {
         className={`flex-1 w-full ${isEven ? "lg:text-right" : "lg:text-left"}`}
       >
         <Card
-          className={`relative overflow-hidden bg-card/40 backdrop-blur-sm border-border hover:border-primary/50 transition-all duration-500 group ${item.isCurrent ? "ring-1 ring-primary/30" : ""}`}
+          className={`relative overflow-hidden transition-all duration-500 group 
+          bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 
+          hover:border-primary/50 shadow-sm dark:shadow-none
+          ${item.isCurrent ? "ring-1 ring-primary/30" : ""}`}
         >
           {item.isCurrent && (
             <div className="absolute top-0 right-0 p-2">
-              <Badge className="bg-primary text-primary-foreground text-[10px] animate-pulse">
+              <Badge className="bg-primary text-white text-[10px] animate-pulse border-none">
                 Present
               </Badge>
             </div>
@@ -87,41 +90,47 @@ function TimelineCard({ item, index }: { item: TimelineItem; index: number }) {
 
           <CardContent className="p-6">
             <div
-              className={`flex items-start gap-4 mb-4 ${isEven ? "lg:flex-row-reverse" : ""}`}
+              className={`flex items-start gap-4 mb-4 ${
+                isEven ? "lg:flex-row-reverse" : ""
+              }`}
             >
               <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-500">
                 <Icon className="w-6 h-6 text-primary" />
               </div>
               <div className={isEven ? "lg:text-right" : ""}>
-                <h3 className="text-xl font-bold text-foreground font-montserrat tracking-tight">
+                <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 font-montserrat tracking-tight">
                   {item.title}
                 </h3>
-                <p className="text-primary font-mono text-sm tracking-tighter uppercase">
+                <p className="text-primary font-mono text-sm font-bold tracking-tighter uppercase">
                   {item.organization}
                 </p>
               </div>
             </div>
 
             <div
-              className={`flex items-center gap-2 text-xs font-medium text-muted-foreground mb-4 ${isEven ? "lg:justify-end" : ""}`}
+              className={`flex items-center gap-2 text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-4 ${
+                isEven ? "lg:justify-end" : ""
+              }`}
             >
               <Calendar className="w-3.5 h-3.5 text-primary/60" />
               {item.period}
             </div>
 
-            <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed mb-6 font-medium">
               {item.description}
             </p>
 
             {item.skills && (
               <div
-                className={`flex flex-wrap gap-2 ${isEven ? "lg:justify-end" : ""}`}
+                className={`flex flex-wrap gap-2 ${
+                  isEven ? "lg:justify-end" : ""
+                }`}
               >
                 {item.skills.map((skill) => (
                   <Badge
                     key={skill}
                     variant="outline"
-                    className="text-[10px] py-0 border-primary/20 bg-primary/5"
+                    className="text-[10px] py-0 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300"
                   >
                     {skill}
                   </Badge>
@@ -132,11 +141,13 @@ function TimelineCard({ item, index }: { item: TimelineItem; index: number }) {
         </Card>
       </div>
 
-      {/* Marker */}
+      {/* Marker Dot */}
       <div className="hidden lg:flex flex-col items-center z-10">
         <motion.div
           whileHover={{ scale: 1.5 }}
-          className={`w-4 h-4 rounded-full border-4 border-background shadow-xl transition-colors duration-300 ${item.isCurrent ? "bg-primary" : "bg-muted-foreground/30"}`}
+          className={`w-4 h-4 rounded-full border-4 shadow-xl transition-colors duration-300 
+          border-white dark:border-black
+          ${item.isCurrent ? "bg-primary" : "bg-zinc-300 dark:bg-zinc-700"}`}
         />
       </div>
 
@@ -155,25 +166,31 @@ export function Experience() {
   const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   return (
-    <section id="experience" className="py-24 md:py-32 relative bg-zinc-950/30">
+    <section
+      id="experience"
+      className="py-24 md:py-32 relative bg-white dark:bg-black transition-colors duration-500"
+    >
       <div className="max-w-6xl mx-auto px-6">
         <ScrollWrapper className="mb-20">
           <div className="flex flex-col items-center text-center">
-            <h2 className="text-4xl md:text-5xl font-black text-foreground font-montserrat tracking-tighter">
+            <h2 className="text-4xl md:text-5xl font-black text-zinc-900 dark:text-white font-montserrat tracking-tighter">
               Experience &{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">
                 Education.
               </span>
             </h2>
-            <div className="h-1 w-20 bg-primary/20 mt-6 rounded-full" />
+            <div className="h-1.5 w-24 bg-primary/10 mt-6 rounded-full overflow-hidden">
+              <div className="h-full w-1/2 bg-primary" />
+            </div>
           </div>
         </ScrollWrapper>
 
         <div ref={containerRef} className="relative mt-10">
+          {/* Vertical Timeline Line */}
           <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2">
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-border to-transparent" />
+            <div className="absolute inset-0 bg-zinc-100 dark:bg-zinc-900" />
             <motion.div
-              className="absolute top-0 left-0 w-full bg-gradient-to-b from-primary/50 to-primary origin-top shadow-[0_0_15px_rgba(var(--primary),0.5)]"
+              className="absolute top-0 left-0 w-full bg-gradient-to-b from-primary/50 via-primary to-primary origin-top shadow-[0_0_15px_rgba(var(--primary),0.5)]"
               style={{ height: lineHeight }}
             />
           </div>

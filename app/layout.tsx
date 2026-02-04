@@ -4,12 +4,13 @@ import { Inter, Montserrat, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SmoothScrollProvider } from "@/components/providers/smooth-scroll-provider";
-import { Navbar } from "@/components/navbar"; // Tambahkan Navbar di sini
+import { Navbar } from "@/components/navbar";
 import CustomCursor from "@/components/custom-cursor";
 import FloatingAI from "@/components/floating-ai";
+
 import "./globals.css";
 
-// Konfigurasi Font dengan Display Swap untuk performa LCP yang lebih baik
+// 1. Optimasi Font: Menggunakan variabel CSS untuk konsistensi di Tailwind
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -47,7 +48,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "id_ID",
-    url: "https://sakibfaturrahman.dev", // Sesuaikan dengan domain kamu nanti
+    url: "https://sakibfaturrahman.dev",
     title: "Sakib Faturrahman | Back-End Developer",
     description: "Building scalable systems with clean architecture.",
     siteName: "Sakib Portfolio",
@@ -61,7 +62,7 @@ export const viewport: Viewport = {
   ],
   width: "device-width",
   initialScale: 1,
-  maximumScale: 5, // Mengizinkan zoom untuk aksesibilitas
+  maximumScale: 5,
 };
 
 export default function RootLayout({
@@ -70,6 +71,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    // suppressHydrationWarning ditambahkan di sini karena ThemeProvider sering mengubah class pada <html>
     <html lang="id" suppressHydrationWarning>
       <body
         className={`
@@ -85,25 +87,22 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* Smooth Scroll Wrapper harus membungkus seluruh konten interaktif */}
           <SmoothScrollProvider>
-            {/* 1. Navbar (Kapsul Melayang) */}
+            {/* Navigasi Utama */}
             <Navbar />
 
-            {/* 2. Custom Cursor (Logika Canvas Ular RGB) */}
+            {/* Elemen UI Melayang */}
             <CustomCursor />
+            <FloatingAI />
 
-            {/* 3. Main Content Container */}
+            {/* Konten Utama */}
             <main className="relative flex min-h-screen flex-col">
               {children}
             </main>
-
-            {/* 4. Floating AI Assistant */}
-            <FloatingAI />
           </SmoothScrollProvider>
         </ThemeProvider>
 
-        {/* Vercel Analytics */}
+        {/* Analytics diletakkan di luar provider utama untuk menghindari re-render yang tidak perlu */}
         <Analytics />
       </body>
     </html>
