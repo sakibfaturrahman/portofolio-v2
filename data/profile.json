@@ -15,7 +15,7 @@
     "location": "Tasikmalaya, Jawa Barat",
     "email": "sakibfaturrahman92@gmail.com",
     "phone": "+6281933340862",
-    "website": "https://sakibftrrhmn.vercel.app",
+    "website": "https://sakibdev.my.id",
     "about_me": "Lulusan SMK Rekayasa Perangkat Lunak (RPL) dengan spesialisasi pengembangan web sisi Back-End. Saat ini sedang menempuh pendidikan S1 Teknik Informatika sambil terus mengasah keterampilan dalam mencari solusi teknis terbaik untuk setiap proyek."
   },
 
@@ -24,7 +24,7 @@
       "institution": "Universitas Perjuangan Tasikmalaya",
       "degree": "S1 Teknik Informatika",
       "period": "2024 - Sekarang",
-      "status": "Mahasiswa Semester 3"
+      "status": "Mahasiswa Semester 4"
     },
     {
       "institution": "SMK Daarul Abroor",
@@ -70,11 +70,11 @@
 
   "skills": {
     "hard_skills": [
-      "HTML",
-      "CSS",
       "JavaScript",
       "PHP",
       "Laravel",
+      "Tailwind CSS",
+      "Bootstrap",
       "React.js",
       "Next.js",
       "Express.js",

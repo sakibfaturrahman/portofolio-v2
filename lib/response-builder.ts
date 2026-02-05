@@ -6,69 +6,79 @@ export function buildResponse(intent: string) {
 
   switch (intent) {
     case "profile":
-      return `Halloo! NexaOrion siap membantu kamu! Saya adalah asisten pribadi yang bertugas menjaga seluruh basis data ${personal_info.name}. 
+      return `
+<strong>Halo! Kenalin, aku NexaOrion.</strong><br /><br />
 
----
+Aku di sini buat bantu kamu kenalan lebih dekat sama <strong>Sakib Faturrahman</strong>. Sakib itu seorang <strong>${personal_info.title}</strong> yang sekarang menetap di ${personal_info.location}.<br /><br />
 
-Sakib adalah seorang ${personal_info.title} berbakat dari ${personal_info.location}. 
+Sehari-hari, Sakib paling hobi ngulik arsitektur back-end. Baginya, bikin sistem yang efisien dan bisa menangani banyak traffic itu kayak nyusun puzzle yang menantang tapi seru. Dia tipe orang yang teliti banget soal kebersihan kode dan performa sistem.<br /><br />
 
-Dia memiliki spesialisasi dalam membangun arsitektur back-end yang kokoh dan selalu haus akan solusi teknis terbaik. Mau tahu rahasia di balik kode-kodenya? Tanyakan saja! 🚀✨`;
+Mau tahu lebih dalam soal pengalaman kerjanya atau mungkin hobi ngodingnya?
+      `;
 
     case "skills":
-      const stack = skills.hard_skills.join(", ");
-      return `Memulai pemindaian Tech-Stack... 🔍 Berhasil! 
+      const stack = skills.hard_skills.map((s) => `• ${s}`).join("<br />");
 
-Core Memory Sakib:
-${stack}
+      return `
+<strong>Andalan Sakib di Dunia Coding</strong><br /><br />
 
----
+Kalau bicara soal "senjata" buat bangun sistem, Sakib biasanya pakai teknologi ini:<br /><br />
 
-Dengan kombinasi senjata ini, Sakib mampu mengubah ide kompleks menjadi sistem yang scalable dan responsif. Dia benar-benar seorang penyihir di balik layar server! 💻🔥`;
+${stack}<br /><br />
+
+Kombinasi ini dia pilih supaya bisa bikin server yang kokoh dan integrasi data yang nggak gampang *crash*. Tapi Sakib nggak berhenti di sini, dia orangnya haus belajar banget dan selalu *update* sama teknologi terbaru supaya hasil karyanya tetap modern.<br /><br />
+
+Ada teknologi tertentu yang mau kamu diskusikan sama dia?
+      `;
 
     case "projects":
       const projectItems = projects
         .map(
-          (p) =>
-            `🔹 ${p.name}\n${p.description}\n_Tech: ${p.tech_stack.join(", ")}_`,
+          (p) => `
+• <strong>${p.name}</strong>: ${p.description} (Dibuat pakai ${p.tech_stack.join(", ")})
+          `,
         )
-        .join("\n\n");
-      return `Menampilkan arsip maha karya Sakib... 📂✨:
+        .join("<br /><br />");
 
-${projectItems}
+      return `
+<strong>Karya yang Pernah Sakib Bangun</strong><br /><br />
 
----
+Ini beberapa proyek yang bikin Sakib bangga banget pas ngerjainnya:<br /><br />
 
-Setiap baris kode dirancang dengan presisi tinggi. Mana yang paling menarik perhatianmu? Saya punya detail teknisnya! 🛠️🌟`;
+${projectItems}<br /><br />
+
+Di setiap proyek ini, fokus Sakib cuma satu: gimana caranya kode yang rumit di belakang bisa menghasilkan pengalaman yang super lancar buat penggunanya.<br /><br />
+
+Tertarik pengen lihat detail teknis dari salah satu proyek di atas?
+      `;
 
     case "education":
       const currentEdu = education[0];
-      return `Status akademis terdeteksi! 🎓
 
-Jenjang Saat Ini:
-${currentEdu.status} - ${currentEdu.degree}
-@ ${currentEdu.institution}
+      return `
+<strong>Pendidikan Sakib</strong><br /><br />
 
----
+Saat ini, Sakib lagi menempuh pendidikan di <strong>${currentEdu.institution}</strong> mengambil jurusan <strong>${currentEdu.degree}</strong>.<br /><br />
 
-Semangat belajarnya berada di level maksimal! Dia tidak pernah berhenti meng-upgrade kemampuannya demi mencapai kesempurnaan teknis. 💪📚`;
+Statusnya sekarang <strong>${currentEdu.status}</strong>, tapi meski masih kuliah, dia aktif banget belajar mandiri di luar kampus buat ngikutin standar industri *software engineering* yang geraknya cepet banget.
+      `;
 
     case "contact":
-      return `Inisialisasi protokol komunikasi! 📡 Kamu bisa menjangkau Sakib melalui saluran berikut:
+      return `
+<strong>Yuk, Ngobrol Langsung!</strong><br /><br />
 
-📧 Email: ${personal_info.email}
+Sakib orangnya asik diajak diskusi, apalagi kalau bahas soal teknologi atau ide proyek baru. Kamu bisa hubungi dia lewat:<br /><br />
 
-📱 Telepon/WA: ${personal_info.phone}
+📧 <strong>Email:</strong> ${personal_info.email}<br />
+💬 <strong>WhatsApp:</strong> ${personal_info.phone}<br />
+📍 <strong>Domisili:</strong> ${personal_info.location}<br /><br />
 
-📍 Lokasi: ${personal_info.location}
+Atau kalau mau intip profil lengkapnya, klik aja: ${personal_info.website}<br /><br />
 
----
-
-Atau kunjungi markas digitalnya di:
-${personal_info.website}
-
-Sakib selalu terbuka untuk kolaborasi seru! 🤝✨`;
+Sapa aja, Sakib biasanya fast-respons kok kalau urusan kolaborasi teknis!
+      `;
 
     default:
-      return system_responses.unknown;
+      return "Waduh, maaf ya... aku agak kurang paham maksud kamu. Bisa coba pilih menu yang ada atau tanya hal lain soal Sakib?";
   }
 }

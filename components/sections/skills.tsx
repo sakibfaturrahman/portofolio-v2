@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, Terminal, Cpu } from "lucide-react";
 import { ScrollWrapper } from "@/components/scroll-wrapper";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   staggerContainerVariants,
   staggerItemVariants,
@@ -184,24 +185,30 @@ export function Skills() {
 
                 {/* Category Buttons */}
                 <div className="flex flex-wrap justify-center lg:justify-start gap-2 pt-4">
-                  {categories.map((cat) => (
-                    <Button
-                      key={cat}
-                      variant={activeCategory === cat ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => {
-                        setActiveCategory(cat);
-                        setIsExpanded(false);
-                      }}
-                      className={`text-[10px] uppercase font-bold h-9 px-5 rounded-full transition-all duration-300 ${
-                        activeCategory === cat
-                          ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
-                          : "bg-transparent border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-primary/50"
-                      }`}
-                    >
-                      {cat}
-                    </Button>
-                  ))}
+                  {categories.map((cat) => {
+                    const isActive = activeCategory === cat;
+                    return (
+                      <Button
+                        key={cat}
+                        variant={isActive ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => {
+                          setActiveCategory(cat);
+                          setIsExpanded(false);
+                        }}
+                        className={cn(
+                          "text-[10px] uppercase font-bold h-9 px-5 rounded-full transition-all duration-300",
+                          isActive
+                            ? // Kondisi Aktif: Background Primary, Teks harus kontras (biasanya putih/hitam tergantung tema primary)
+                              "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20"
+                            : // Kondisi Tidak Aktif: Teks adaptif terhadap Dark/Light Mode
+                              "bg-transparent border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 hover:border-primary/50 hover:text-primary dark:hover:text-primary",
+                        )}
+                      >
+                        {cat}
+                      </Button>
+                    );
+                  })}
                 </div>
               </div>
             </ScrollWrapper>

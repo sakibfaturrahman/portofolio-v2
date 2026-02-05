@@ -169,22 +169,6 @@ export function Footer() {
           </p>
         </div>
       </div>
-
-      {/* Floating Back to Top Button */}
-      <AnimatePresence>
-        {showBackToTop && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.5, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.5, y: 20 }}
-            onClick={scrollToTop}
-            className="fixed bottom-8 right-8 z-[100] p-4 bg-primary text-white rounded-full shadow-2xl shadow-primary/40 hover:scale-110 transition-transform active:scale-95"
-            aria-label="Back to top"
-          >
-            <ArrowUp className="w-5 h-5" />
-          </motion.button>
-        )}
-      </AnimatePresence>
     </footer>
   );
 }

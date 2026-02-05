@@ -2,130 +2,156 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Moon, Sun, Menu, X, Languages } from "lucide-react";
+import {
+  Moon,
+  Sun,
+  User,
+  Code2,
+  Briefcase,
+  LayoutGrid,
+  Mail,
+  Home,
+} from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { href: "#about", label: "About" },
-  { href: "#skills", label: "Skills" },
-  { href: "#experience", label: "Experience" },
-  { href: "#projects", label: "Projects" },
-  { href: "#contact", label: "Contact" },
+  { href: "#about", label: "About", icon: User },
+  { href: "#skills", label: "Skills", icon: Code2 },
+  { href: "#experience", label: "Exp", icon: Briefcase },
+  { href: "#projects", label: "Work", icon: LayoutGrid },
+  { href: "#contact", label: "Contact", icon: Mail },
 ];
 
 export function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [language, setLanguage] = useState<"ID" | "EN">("ID");
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
 
   useEffect(() => {
     setMounted(true);
-  }, []);
 
-  useEffect(() => {
+    // Observer untuk mendeteksi section aktif secara otomatis saat scroll
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // Menggunakan threshold yang pas agar deteksi akurat di mobile
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            setActiveSection(`#${entry.target.id}`);
+          }
+        });
+      },
+      {
+        threshold: [0.2, 0.5, 0.8],
+        rootMargin: "-10% 0px -20% 0px", // Offset agar deteksi terjadi sebelum section mentok ke atas
+      },
+    );
+
+    const sections = document.querySelectorAll("section[id]");
+    sections.forEach((section) => observer.observe(section));
+
+    // Deteksi jika di paling atas (Home)
     const handleScroll = () => {
-      // Navbar berubah saat di-scroll
-      setIsScrolled(window.scrollY > 20);
+      if (window.scrollY < 100) {
+        setActiveSection("");
+      }
     };
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   const handleNavClick = (href: string) => {
-    setIsMobileMenuOpen(false);
+    setActiveSection(href);
     const element = document.querySelector(href);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
   };
 
-  const toggleLanguage = () => {
-    setLanguage((prev) => (prev === "ID" ? "EN" : "ID"));
-  };
-
   return (
     <>
-      <div className="fixed top-0 left-0 right-0 z-50 flex justify-center p-4 md:p-6 pointer-events-none">
+      {/* --- HEADER (Desktop & Mobile Logo/Theme) --- */}
+      <div className="fixed top-0 left-0 right-0 z-50 flex justify-center p-4 pointer-events-none">
         <motion.header
           initial={{ y: -100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className={cn(
-            "pointer-events-auto transition-all duration-500 ease-in-out overflow-hidden",
-            // Desain Kapsul Melayang (Desktop)
+            "pointer-events-auto transition-all duration-500",
             "w-full md:w-fit md:min-w-[500px] rounded-2xl md:rounded-full border border-border/50",
-            "bg-background/60 backdrop-blur-xl shadow-lg",
-            isScrolled ? "md:px-4 py-2" : "md:px-6 py-3",
+            "bg-background/60 backdrop-blur-xl shadow-lg px-4 py-2",
           )}
         >
-          <nav className="flex items-center justify-between gap-8 px-4 md:px-2">
-            {/* Logo */}
+          <nav className="flex items-center justify-between gap-8">
             <motion.a
               href="#"
-              className="text-lg font-black text-foreground font-montserrat tracking-tighter shrink-0"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              className="text-lg font-black text-foreground font-montserrat tracking-tighter"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
             >
               SF<span className="text-primary">.</span>
             </motion.a>
 
-            {/* Desktop Navigation Link */}
-            <div className="hidden md:flex items-center gap-6">
-              {navLinks.map((link) => (
-                <motion.button
-                  key={link.href}
-                  onClick={() => handleNavClick(link.href)}
-                  className="text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-all relative group"
-                >
-                  {link.label}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
-                </motion.button>
-              ))}
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-2">
+              {navLinks.map((link) => {
+                const isActive = activeSection === link.href;
+                return (
+                  <button
+                    key={link.href}
+                    onClick={() => handleNavClick(link.href)}
+                    className={cn(
+                      "relative px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-colors duration-300",
+                      isActive
+                        ? "text-primary"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    <span className="relative z-10">{link.label}</span>
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeTabDesktop"
+                        className="absolute inset-0 bg-primary/10 rounded-full"
+                        transition={{
+                          type: "spring",
+                          bounce: 0.3,
+                          duration: 0.6,
+                        }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Controls */}
-            <div className="flex items-center gap-1 md:gap-2 shrink-0">
-              {/* Language */}
-              {/* <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleLanguage}
-                className="h-8 md:h-9 px-2 md:px-3 rounded-full hover:bg-primary/10"
-              >
-                <Languages className="h-4 w-4 text-primary mr-1 md:mr-2" />
-                <span className="text-[10px] font-black font-mono leading-none">
-                  {language}
-                </span>
-              </Button> */}
-
-              {/* Theme Toggle */}
+            <div className="flex items-center">
               {mounted && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="h-8 w-8 md:h-9 md:w-9 rounded-full hover:bg-primary/10"
+                  className="h-9 w-9 rounded-full hover:bg-primary/10 transition-transform active:scale-90"
                 >
                   <AnimatePresence mode="wait">
                     {theme === "dark" ? (
                       <motion.div
                         key="sun"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
+                        initial={{ rotate: -90, opacity: 0 }}
+                        animate={{ rotate: 0, opacity: 1 }}
+                        exit={{ rotate: 90, opacity: 0 }}
                       >
                         <Sun className="h-4 w-4 text-yellow-500" />
                       </motion.div>
                     ) : (
                       <motion.div
                         key="moon"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
+                        initial={{ rotate: -90, opacity: 0 }}
+                        animate={{ rotate: 0, opacity: 1 }}
+                        exit={{ rotate: 90, opacity: 0 }}
                       >
                         <Moon className="h-4 w-4 text-blue-500" />
                       </motion.div>
@@ -133,51 +159,84 @@ export function Navbar() {
                   </AnimatePresence>
                 </Button>
               )}
-
-              {/* Mobile Trigger */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden h-8 w-8 rounded-full"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              >
-                {isMobileMenuOpen ? (
-                  <X className="h-4 w-4" />
-                ) : (
-                  <Menu className="h-4 w-4" />
-                )}
-              </Button>
             </div>
           </nav>
         </motion.header>
       </div>
 
-      {/* Mobile Menu Dropdown */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="fixed inset-x-4 top-20 z-50 bg-background/95 backdrop-blur-2xl border border-border rounded-3xl md:hidden shadow-2xl overflow-hidden"
-          >
-            <nav className="flex flex-col p-6 gap-2">
-              {navLinks.map((link, index) => (
-                <motion.button
-                  key={link.href}
-                  initial={{ x: -10, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: index * 0.05 }}
-                  onClick={() => handleNavClick(link.href)}
-                  className="text-left text-sm font-bold uppercase tracking-widest text-muted-foreground hover:text-primary py-3 transition-colors border-b border-border/50 last:border-0"
-                >
-                  {link.label}
-                </motion.button>
-              ))}
-            </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* --- MOBILE BOTTOM BAR --- */}
+      <div className="md:hidden fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+        <motion.div
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="pointer-events-auto bg-background/80 backdrop-blur-2xl border border-border/50 rounded-[2.5rem] shadow-2xl p-2 w-full max-w-[400px]"
+        >
+          <div className="flex items-center justify-around relative">
+            {/* Nav Item: Home */}
+            <MobileNavItem
+              href=""
+              label="Home"
+              icon={Home}
+              isActive={activeSection === ""}
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+                setActiveSection("");
+              }}
+            />
+
+            {/* Nav Item: Sections */}
+            {navLinks.map((link) => (
+              <MobileNavItem
+                key={link.href}
+                href={link.href}
+                label={link.label}
+                icon={link.icon}
+                isActive={activeSection === link.href}
+                onClick={() => handleNavClick(link.href)}
+              />
+            ))}
+          </div>
+        </motion.div>
+      </div>
     </>
+  );
+}
+
+// Sub-Komponen untuk Navigasi Mobile agar kode bersih
+function MobileNavItem({ href, label, icon: Icon, isActive, onClick }: any) {
+  return (
+    <motion.button
+      onClick={onClick}
+      whileTap={{ scale: 0.9 }}
+      className={cn(
+        "relative flex flex-col items-center gap-1 p-3 transition-all duration-300 rounded-2xl",
+        isActive ? "text-primary" : "text-muted-foreground",
+      )}
+    >
+      {/* Efek Hover (Hanya terlihat saat ditekan/hover di mobile tertentu) */}
+      <motion.div
+        className="absolute inset-0 bg-primary/5 rounded-2xl opacity-0"
+        whileHover={{ opacity: 1 }}
+      />
+
+      <Icon
+        className={cn(
+          "h-5 w-5 relative z-10 transition-transform",
+          isActive && "scale-110",
+        )}
+      />
+      <span className="text-[9px] font-bold uppercase relative z-10">
+        {label}
+      </span>
+
+      {/* Indikator Active Meluncur */}
+      {isActive && (
+        <motion.div
+          layoutId="activeTabMobile"
+          className="absolute inset-0 bg-primary/10 rounded-2xl border-t-2 border-primary/20"
+          transition={{ type: "spring", bounce: 0.3, duration: 0.6 }}
+        />
+      )}
+    </motion.button>
   );
 }

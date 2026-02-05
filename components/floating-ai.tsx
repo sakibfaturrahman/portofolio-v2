@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
   Send,
-  ChevronUp,
   Loader2,
   User,
   Orbit,
@@ -23,7 +22,6 @@ type Message = {
   timestamp: Date;
 };
 
-// Daftar teks ajakan yang akan muncul secara acak
 const invitationTexts = [
   "Penasaran sama Sakib? Tanya AI aja! ✨",
   "Cari tahu pengalaman Sakib lebih cepat di sini. 🚀",
@@ -36,7 +34,6 @@ const invitationTexts = [
 export default function FloatingAI() {
   const [isOpen, setIsOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
-  const [showScrollTop, setShowScrollTop] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,7 +43,7 @@ export default function FloatingAI() {
   );
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // --- Logic Tooltip Berubah-ubah (7s Tampil, 3s Hilang) ---
+  // --- Logic Tooltip Dinamis ---
   useEffect(() => {
     if (isOpen) {
       setShowTooltip(false);
@@ -54,14 +51,10 @@ export default function FloatingAI() {
     }
 
     let timeoutId: NodeJS.Timeout;
-
     const intervalId = setInterval(() => {
-      // Pilih teks acak
       const randomIndex = Math.floor(Math.random() * invitationTexts.length);
       setCurrentTooltipText(invitationTexts[randomIndex]);
-
       setShowTooltip(true);
-
       timeoutId = setTimeout(() => {
         setShowTooltip(false);
       }, 7000);
@@ -73,7 +66,7 @@ export default function FloatingAI() {
     };
   }, [isOpen]);
 
-  // Auto Scroll
+  // --- Auto Scroll ---
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({
@@ -82,13 +75,6 @@ export default function FloatingAI() {
       });
     }
   }, [messages, isLoading]);
-
-  // Scroll Listener
-  useEffect(() => {
-    const handleScroll = () => setShowScrollTop(window.scrollY > 400);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   const getAIResponse = async (userInput: string, intent?: string) => {
     setIsLoading(true);
@@ -102,6 +88,7 @@ export default function FloatingAI() {
         const data = await res.json();
         return data.text || "Waduh, koneksi ke Gemini terputus nih! 📡";
       } else {
+        // MODE OFFLINE merender HTML dari buildResponse
         await new Promise((resolve) => setTimeout(resolve, 600));
         return buildResponse(intent || "unknown");
       }
@@ -148,23 +135,8 @@ export default function FloatingAI() {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-[100] flex flex-col items-end gap-3">
-      {/* Scroll Top Button */}
-      <AnimatePresence>
-        {showScrollTop && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5 }}
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="w-10 h-10 flex items-center justify-center rounded-2xl bg-white dark:bg-zinc-800 border shadow-xl"
-          >
-            <ChevronUp size={20} className="text-zinc-500" />
-          </motion.button>
-        )}
-      </AnimatePresence>
-
-      {/* Tooltip AI dengan Teks Dinamis */}
+    <div className="fixed bottom-28 md:bottom-8 right-4 md:right-8 z-[100] flex flex-col items-end gap-3 transition-all duration-300">
+      {/* Tooltip */}
       <AnimatePresence>
         {showTooltip && !isOpen && (
           <motion.div
@@ -178,12 +150,11 @@ export default function FloatingAI() {
               <p className="text-[11px] font-bold">{currentTooltipText}</p>
               <button
                 onClick={() => setShowTooltip(false)}
-                className="ml-1 opacity-50 hover:opacity-100 transition-opacity"
+                className="ml-1 opacity-50 hover:opacity-100"
               >
                 <X size={12} />
               </button>
             </div>
-            {/* Arrow/Ekor Tooltip */}
             <div className="absolute -bottom-1 right-0 w-3 h-3 bg-zinc-900 dark:bg-zinc-100 rotate-45" />
           </motion.div>
         )}
@@ -198,7 +169,7 @@ export default function FloatingAI() {
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             className="w-[340px] md:w-[360px] h-[500px] md:h-[550px] flex flex-col bg-white dark:bg-zinc-900 border shadow-2xl rounded-[2.5rem] overflow-hidden"
           >
-            {/* Header Area */}
+            {/* Header */}
             <div className="p-4 flex items-center justify-between border-b bg-zinc-50/50 dark:bg-zinc-800/50 backdrop-blur-md">
               <div className="flex items-center gap-2">
                 <Orbit
@@ -210,7 +181,7 @@ export default function FloatingAI() {
                     NexaOrion
                   </p>
                   <p className="text-[9px] font-bold text-zinc-500 uppercase">
-                    {isOnline ? "Online Core" : "Offline Core"}
+                    {isOnline ? "Online" : "Offline"}
                   </p>
                 </div>
               </div>
@@ -230,22 +201,23 @@ export default function FloatingAI() {
               </div>
             </div>
 
-            {/* Messages Container */}
+            {/* Chat Area */}
             <div
               ref={scrollRef}
               className="flex-1 overflow-y-auto p-4 space-y-4"
             >
+              {/* Pesan Awal */}
               <div className="flex gap-2">
                 <div className="p-2 h-fit rounded-lg bg-primary/10">
                   <Cpu size={14} className="text-primary" />
                 </div>
                 <div className="bg-zinc-100 dark:bg-zinc-800 p-3 rounded-2xl rounded-tl-none text-xs text-zinc-800 dark:text-zinc-200">
-                  Unit NexaOrion aktif! Mode:{" "}
-                  <b>{isOnline ? "Online" : "Offline"}</b>. Ada yang bisa saya
-                  bantu untuk mengenal Sakib lebih dalam? 🚀
+                  Unit NexaOrion aktif! Ada yang bisa saya bantu untuk mengenal
+                  Sakib lebih dalam? 🚀
                 </div>
               </div>
 
+              {/* Mapping Messages */}
               {messages.map((msg, i) => (
                 <div
                   key={i}
@@ -263,15 +235,17 @@ export default function FloatingAI() {
                       <Sparkles size={14} className="text-primary" />
                     )}
                   </div>
+
+                  {/* Bubble Pesan dengan Render HTML */}
                   <div
-                    className={`max-w-[80%] p-3 rounded-2xl text-xs ${
+                    className={`max-w-[80%] p-3 rounded-2xl text-xs leading-relaxed ${
                       msg.role === "user"
-                        ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 rounded-tr-none"
+                        ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 rounded-tr-none font-medium"
                         : "bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-tl-none shadow-sm"
                     }`}
-                  >
-                    {msg.text}
-                  </div>
+                    // PERBAIKAN: Menggunakan dangerouslySetInnerHTML untuk merender tag HTML dari asisten
+                    dangerouslySetInnerHTML={{ __html: msg.text }}
+                  />
                 </div>
               ))}
 
@@ -283,7 +257,7 @@ export default function FloatingAI() {
               )}
             </div>
 
-            {/* Footer Control Area */}
+            {/* Controls */}
             <div className="p-4 border-t bg-zinc-50/30 dark:bg-zinc-900/30 backdrop-blur-md space-y-3">
               <div className="flex flex-wrap gap-2">
                 {[
@@ -295,7 +269,7 @@ export default function FloatingAI() {
                   <button
                     key={btn.i}
                     onClick={() => handleAction(btn.i, btn.l)}
-                    className="text-[10px] px-3 py-1.5 rounded-xl border bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 hover:border-primary dark:hover:border-primary transition-all active:scale-95 shadow-sm font-medium text-zinc-700 dark:text-zinc-300"
+                    className="text-[10px] px-3 py-1.5 rounded-xl border bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 hover:border-primary transition-all active:scale-95 font-medium text-zinc-700 dark:text-zinc-300 shadow-sm"
                   >
                     {btn.l}
                   </button>
@@ -306,18 +280,14 @@ export default function FloatingAI() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-                  placeholder={
-                    isOnline
-                      ? "Tanya apa saja ke Gemini..."
-                      : "Mode Offline aktif..."
-                  }
+                  placeholder={isOnline ? "Tanya Gemini..." : "Mode Offline..."}
                   disabled={!isOnline}
-                  className="flex-1 px-4 py-2.5 text-xs rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-primary/20 outline-none focus:border-primary transition-all disabled:opacity-50"
+                  className="flex-1 px-4 py-2.5 text-xs rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white outline-none focus:border-primary transition-all disabled:opacity-50"
                 />
                 <button
                   onClick={handleSendMessage}
                   disabled={!isOnline || !input.trim() || isLoading}
-                  className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center hover:opacity-90 disabled:bg-zinc-400 shadow-lg shadow-primary/20 transition-all"
+                  className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center shadow-lg hover:opacity-90 disabled:bg-zinc-400 transition-all"
                 >
                   <Send size={16} />
                 </button>
@@ -327,12 +297,12 @@ export default function FloatingAI() {
         )}
       </AnimatePresence>
 
-      {/* Main Launcher Button */}
+      {/* Main Button */}
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 rounded-2xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center shadow-2xl border border-white/10 dark:border-zinc-200 group relative"
+        className="w-14 h-14 rounded-2xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center shadow-2xl border border-white/10 dark:border-zinc-200 group relative"
       >
         <Orbit
           size={28}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { motion, Variants } from "framer-motion";
@@ -36,6 +36,20 @@ const GitHubCalendar = dynamic<any>(
 
 export function Projects() {
   const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [calendarBlockSize, setCalendarBlockSize] = useState(12);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        setCalendarBlockSize(10); // Sedikit lebih besar agar mudah dilihat saat di-scroll
+      } else {
+        setCalendarBlockSize(12);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const getIconUrl = (tag: string) => {
     const map: Record<string, string> = {
@@ -100,11 +114,11 @@ export function Projects() {
   return (
     <section
       id="projects"
-      className="py-24 bg-white dark:bg-black transition-colors duration-500 relative overflow-hidden"
+      className="py-20 md:py-24 bg-white dark:bg-black transition-colors duration-500 relative overflow-hidden"
     >
-      <div className="max-w-6xl mx-auto px-6 relative z-10">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 relative z-10">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-16">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 md:mb-16">
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20">
               <Sparkles className="w-3 h-3 text-blue-500" />
@@ -112,56 +126,55 @@ export function Projects() {
                 Portfolio
               </span>
             </div>
-            <h2 className="text-4xl md:text-6xl font-black text-black dark:text-white tracking-tighter">
+            <h2 className="text-3xl md:text-6xl font-black text-black dark:text-white tracking-tighter">
               Featured{" "}
               <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
                 Projects.
               </span>
             </h2>
           </div>
-          <p className="text-zinc-500 dark:text-zinc-400 text-sm max-w-[300px] font-medium border-l-2 border-zinc-200 dark:border-zinc-800 pl-4">
+          <p className="text-zinc-500 dark:text-zinc-400 text-xs md:text-sm max-w-[300px] font-medium border-l-2 border-zinc-200 dark:border-zinc-800 pl-4">
             Curated systems designed for scale, performance, and impact.
           </p>
         </div>
 
-        {/* GitHub Calendar Section - Pure Black/White */}
-        <ScrollWrapper className="mb-16">
-          <div className="p-8 rounded-[2.5rem] bg-zinc-50 dark:bg-[#080808] border border-zinc-100 dark:border-zinc-900 group overflow-hidden">
-            <div className="grid lg:grid-cols-3 gap-12 items-start">
+        {/* GitHub Calendar Section - UPDATED FOR SCROLLING */}
+        <ScrollWrapper className="mb-12 md:mb-16">
+          <div className="p-5 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] bg-zinc-50 dark:bg-[#080808] border border-zinc-100 dark:border-zinc-900 overflow-hidden group">
+            <div className="grid lg:grid-cols-3 gap-8 md:gap-12 items-start">
               <div className="lg:col-span-2">
-                <div className="flex items-center justify-between mb-10">
+                <div className="flex items-center justify-between mb-6 md:mb-10">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 flex items-center justify-center shadow-sm">
-                      <Code2 className="text-blue-600 dark:text-blue-400 w-6 h-6" />
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 flex items-center justify-center shadow-sm">
+                      <Code2 className="text-blue-600 dark:text-blue-400 w-5 h-5 md:w-6 md:h-6" />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-black dark:text-white">
+                      <h3 className="text-sm md:text-base font-bold text-black dark:text-white">
                         GitHub Contributions
                       </h3>
-                      <p className="text-[10px] text-zinc-500 font-mono">
-                        github.com/sakibfaturrahman
+                      <p className="text-[9px] md:text-[10px] text-zinc-500 font-mono">
+                        @sakibfaturrahman
                       </p>
                     </div>
                   </div>
+                  {/* Info Geser di Mobile */}
+                  <span className="md:hidden text-[10px] font-bold text-zinc-400 animate-pulse flex items-center gap-1">
+                    Scroll →
+                  </span>
                 </div>
 
-                <div className="w-full overflow-x-auto scrollbar-hide">
-                  <div className="min-w-[650px] transition-all duration-500 group-hover:filter group-hover:brightness-110">
+                {/* Calendar Container: overflow-x-auto memungkinkan geser ke samping */}
+                <div className="w-full overflow-x-auto scrollbar-hide cursor-grab active:cursor-grabbing pb-2">
+                  {/* min-w memastikan kalender tidak mengecil dan memaksa adanya area scroll */}
+                  <div className="min-w-[700px] md:min-w-full transition-all duration-500 group-hover:filter group-hover:brightness-110">
                     <GitHubCalendar
                       username="sakibfaturrahman"
-                      blockSize={12}
+                      blockSize={calendarBlockSize}
                       blockMargin={4}
-                      fontSize={11}
-                      key={new Date().getDay()}
-                      colorScheme="dark" // Anda bisa menggunakan hook theme di sini jika perlu dinamis
+                      fontSize={10}
+                      key={`${new Date().getDay()}-${calendarBlockSize}`}
+                      colorScheme="dark"
                       theme={{
-                        light: [
-                          "#ebedf0",
-                          "#9be9a8",
-                          "#40c463",
-                          "#30a14e",
-                          "#216e39",
-                        ],
                         dark: [
                           "#161b22",
                           "#0e4429",
@@ -175,7 +188,7 @@ export function Projects() {
                 </div>
               </div>
 
-              <div className="lg:border-l lg:border-zinc-200 dark:lg:border-zinc-800 lg:pl-10 space-y-6">
+              <div className="hidden lg:block lg:border-l lg:border-zinc-200 dark:lg:border-zinc-800 lg:pl-10 space-y-6">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">
                     Code Pulse
@@ -190,26 +203,8 @@ export function Projects() {
                 </h4>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
                   Every commit represents a step towards building more robust
-                  and scalable back-end solutions.
+                  solutions.
                 </p>
-                <div className="pt-6 border-t border-zinc-100 dark:border-zinc-900 grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-[10px] text-zinc-400 uppercase font-bold">
-                      Primary
-                    </p>
-                    <p className="text-xs font-semibold text-black dark:text-white">
-                      Back-End
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-zinc-400 uppercase font-bold">
-                      Focus
-                    </p>
-                    <p className="text-xs font-semibold text-black dark:text-white">
-                      Architecture
-                    </p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -221,16 +216,16 @@ export function Projects() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+          className="grid grid-cols-2 gap-3 md:gap-8"
         >
           {projects.map((project) => (
             <motion.div
               key={project.title}
               variants={cardVariants}
               onClick={() => setSelectedProject(project)}
-              className="group cursor-pointer bg-zinc-50 dark:bg-[#080808] border border-zinc-100 dark:border-zinc-900 rounded-[2.5rem] overflow-hidden hover:border-blue-500/50 transition-all duration-500 shadow-sm hover:shadow-xl dark:hover:shadow-blue-500/5"
+              className="group cursor-pointer bg-zinc-50 dark:bg-[#080808] border border-zinc-100 dark:border-zinc-900 rounded-[1.2rem] md:rounded-[2.5rem] overflow-hidden hover:border-blue-500/50 transition-all duration-500 shadow-sm hover:shadow-xl"
             >
-              <div className="relative aspect-video overflow-hidden">
+              <div className="relative aspect-[4/3] md:aspect-video overflow-hidden">
                 <Image
                   src={project.image}
                   alt={project.title}
@@ -240,24 +235,23 @@ export function Projects() {
                 <div className="absolute inset-0 bg-black/5 dark:bg-black/20 group-hover:bg-transparent transition-colors duration-500" />
               </div>
 
-              <div className="p-8 flex items-center justify-between">
-                <div className="space-y-2">
-                  <h3 className="text-2xl font-bold text-black dark:text-white tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+              <div className="p-3 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="space-y-1 md:space-y-2">
+                  <h3 className="text-sm md:text-2xl font-bold text-black dark:text-white tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
                     {project.title}
                   </h3>
-                  <div className="flex gap-3">
-                    {project.tags.slice(0, 4).map((tag: any) => (
+                  <div className="flex gap-1.5 md:gap-3 overflow-hidden">
+                    {project.tags.slice(0, 3).map((tag: any) => (
                       <img
                         key={tag.name}
                         src={tag.icon}
                         alt={tag.name}
-                        className="h-4 w-auto grayscale group-hover:grayscale-0 opacity-40 group-hover:opacity-100 transition-all"
-                        title={tag.name}
+                        className="h-3 md:h-4 w-auto grayscale group-hover:grayscale-0 opacity-40 group-hover:opacity-100 transition-all"
                       />
                     ))}
                   </div>
                 </div>
-                <div className="w-12 h-12 rounded-full bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 flex items-center justify-center group-hover:bg-blue-600 group-hover:border-blue-600 transition-all shadow-sm">
+                <div className="hidden md:flex w-12 h-12 rounded-full bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 items-center justify-center group-hover:bg-blue-600 group-hover:border-blue-600 transition-all shadow-sm">
                   <ArrowRight className="w-6 h-6 text-black dark:text-white group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform" />
                 </div>
               </div>
@@ -266,15 +260,15 @@ export function Projects() {
         </motion.div>
 
         {/* Minimal Footer CTA */}
-        <div className="mt-20 flex justify-center">
+        <div className="mt-12 md:mt-20 flex justify-center">
           <motion.a
             href="https://github.com/sakibfaturrahman"
             target="_blank"
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-3 px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-full font-bold text-xs tracking-widest transition-all shadow-xl"
+            className="flex items-center gap-2 md:gap-3 px-6 md:px-8 py-3 md:py-4 bg-black dark:bg-white text-white dark:text-black rounded-full font-bold text-[10px] md:text-xs tracking-widest transition-all shadow-xl"
           >
-            <Github className="w-5 h-5" />
+            <Github className="w-4 h-4 md:w-5 md:h-5" />
             VIEW FULL ARCHIVE
           </motion.a>
         </div>
